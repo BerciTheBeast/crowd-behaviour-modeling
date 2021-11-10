@@ -1,2 +1,2 @@
-# group-behaviour-group-c-extending-proactive-crowd
-Extending ProactiveCrowd crowdbehaviour model with additionalagent behaviours
+# Extending ProactiveCrowd crowdbehaviour model with additionalagent behaviours
+Project for Collective Behaviour course.
