@@ -30,6 +30,6 @@ public class Movement : MonoBehaviour
     public void Move()
     {
         gameObject.transform.LookAt(this.destination.transform.position);
-        gameObject.transform.position += gameObject.transform.forward * speed;
+        gameObject.transform.position += gameObject.transform.forward * speed * Time.fixedDeltaTime;
     }
 }
