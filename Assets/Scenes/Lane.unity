@@ -729,6 +729,7 @@ GameObject:
   - component: {fileID: 1581563021}
   - component: {fileID: 1581563028}
   - component: {fileID: 1581563027}
+  - component: {fileID: 1581563029}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -958,3 +959,15 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &1581563029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581563020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47e3c310a9451314b863830ddbde97cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

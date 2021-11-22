@@ -6,30 +6,30 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
 
-    public float speed;
-    public GameObject destination;
+    UnityEngine.AI.NavMeshAgent agent;
 
-
-    // Start is called before the first frame update
     void Start()
     {
-        
+        agent = this.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        //Start the coroutine we define below named ExampleCoroutine.
+        StartCoroutine(StopHammerTime());
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator StopHammerTime()
     {
-        
-    }
+        //Print the time of when the function is first called.
+        Debug.Log("Started Coroutine at timestamp : " + Time.time);
 
-    void FixedUpdate()
-    {
-        this.Move();
-    }
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(5);
+        Debug.Log("Stopping agent at : " + Time.time);
+        agent.isStopped = true;
 
-    public void Move()
-    {
-        gameObject.transform.LookAt(this.destination.transform.position);
-        gameObject.transform.position += gameObject.transform.forward * speed * Time.fixedDeltaTime;
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(5);
+        agent.isStopped = false;
+
+        //After we have waited 5 seconds print the time again.
+        Debug.Log("Finished Coroutine at timestamp : " + Time.time);
     }
 }
