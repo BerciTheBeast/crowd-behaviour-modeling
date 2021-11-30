@@ -90,4 +90,9 @@ public class Grid
             }
         }
     }
+
+    public void FindNearbyGaps(int x, int y, float dist)
+    {
+        GameObject plane = GameObject.Find("Plane");
+    }
 }
