@@ -9,11 +9,15 @@ public class AgentControl : MonoBehaviour
     public SpawnPoint origin;
     public bool respawn = true;
 
+    [Min(0f)]
+    public float stoppingDistance = 0.5f;
+
     NavMeshAgent agent;
 
     void Start()
     {
         agent = this.GetComponent<NavMeshAgent>();
+        agent.stoppingDistance = stoppingDistance;
         SetAgentDestination();
     }
 
@@ -28,12 +32,7 @@ public class AgentControl : MonoBehaviour
     }
 
     void CheckDestinationReached() {
-        if (
-            respawn &&
-            !agent.pathPending &&
-            (agent.remainingDistance <= agent.stoppingDistance) &&
-            (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-        )
+        if (respawn && agent.remainingDistance <= agent.stoppingDistance)
         {
             this.origin.Respawn(agent.gameObject); 
         }

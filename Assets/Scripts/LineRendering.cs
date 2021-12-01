@@ -8,6 +8,7 @@ public class LineRendering : MonoBehaviour
     LineRenderer line; //to hold the line Renderer
     Transform target; //to hold the transform of the target
     NavMeshAgent agent; //to hold the agent of this gameObject
+    public bool visible = true;
 
     void Start()
         {
@@ -18,7 +19,7 @@ public class LineRendering : MonoBehaviour
 
     void Update()
     {
-        if (!agent.isStopped)
+        if (!agent.isStopped && visible)
         {
             DrawPath(agent.path);
         }

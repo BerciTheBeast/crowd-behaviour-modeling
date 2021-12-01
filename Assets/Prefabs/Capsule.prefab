@@ -138,6 +138,7 @@ MonoBehaviour:
   destination: {x: 0, y: 0, z: 0}
   origin: {fileID: 0}
   respawn: 1
+  stoppingDistance: 0.5
 --- !u!120 &2518359526414878470
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -189,7 +190,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.02531755
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -248,6 +249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee34f4a0fcfd9884085ba5258b3ecfcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visible: 1
 --- !u!114 &2518359526414878471
 MonoBehaviour:
   m_ObjectHideFlags: 0
