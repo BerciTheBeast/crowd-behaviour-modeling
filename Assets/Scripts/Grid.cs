@@ -87,7 +87,26 @@ public class Grid
         }
     }
 
-    public void FindNearbyGaps(Vector3 pos, float searchDist)
+    public void FindNearbyGaps(Vector3 pos, int searchDist)
     {
+        int x, y;
+        GetXY(pos, out x, out y);
+        Debug.Log("x: " + x);
+        Debug.Log("y: " + y);
+
+        List<Vector2> emptyCoords = new List<Vector2>();
+        for (int i = Mathf.Max(0, x - searchDist); i < Mathf.Min(width, x + searchDist); x ++)
+        {
+            for (int j = Mathf.Max(0, y - searchDist); j < Mathf.Min(height, y + searchDist); y ++)
+            {   
+                Debug.Log("point: " + i + ", " + j);
+                if (GetValue(i, j) == 1) emptyCoords.Add(new Vector2(i, j));
+            }
+            break;
+        }
+
+        Debug.Log(emptyCoords.Count);
+
+
     }
 }

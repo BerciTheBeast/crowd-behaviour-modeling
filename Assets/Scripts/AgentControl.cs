@@ -24,6 +24,7 @@ public class AgentControl : MonoBehaviour
         agent.stoppingDistance = stoppingDistance;
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         SetAgentDestination();
+        DetectGaps();
     }
 
     public void SetAgentDestination()
@@ -34,7 +35,6 @@ public class AgentControl : MonoBehaviour
 
     void Update() {
         CheckDestinationReached();
-        DetectGaps();
     }
 
     void CheckDestinationReached()

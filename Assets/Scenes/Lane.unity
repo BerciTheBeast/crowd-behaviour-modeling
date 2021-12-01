@@ -422,7 +422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1621201a307ad9342b59adcf209ae95d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellSize: 1
+  cellSize: 5
 --- !u!1 &480893678
 GameObject:
   m_ObjectHideFlags: 0
@@ -616,11 +616,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 20
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
@@ -822,11 +822,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 20
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
