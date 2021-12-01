@@ -12,7 +12,7 @@ public class Movement : MonoBehaviour
     {
         agent = this.GetComponent<UnityEngine.AI.NavMeshAgent>();
         //Start the coroutine we define below named ExampleCoroutine.
-        StartCoroutine(StopHammerTime());
+        // StartCoroutine(StopHammerTime());
     }
 
     IEnumerator StopHammerTime()
