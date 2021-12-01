@@ -95,10 +95,10 @@ public class Grid
         Debug.Log("y: " + y);
 
         List<Vector2> emptyCoords = new List<Vector2>();
-        for (int i = Mathf.Max(0, x - searchDist); i < Mathf.Min(width, x + searchDist); x ++)
+        for (int i = Mathf.Max(0, x - searchDist); i < Mathf.Min(width, x + searchDist); i ++)
         {
-            for (int j = Mathf.Max(0, y - searchDist); j < Mathf.Min(height, y + searchDist); y ++)
-            {   
+            for (int j = Mathf.Max(0, y - searchDist); j < Mathf.Min(height, y + searchDist); j ++)
+            {
                 Debug.Log("point: " + i + ", " + j);
                 if (GetValue(i, j) == 1) emptyCoords.Add(new Vector2(i, j));
             }
