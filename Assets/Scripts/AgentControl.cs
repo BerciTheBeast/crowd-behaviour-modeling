@@ -5,19 +5,24 @@ using UnityEngine.AI;
 
 public class AgentControl : MonoBehaviour
 {
+    private GridComponent gridComponent;
+    private NavMeshAgent agent;
+
     public Vector3 destination;
     public SpawnPoint origin;
+    
+    [Min(1)]
+    public int gapDistance = 5;
     public bool respawn = true;
-
     [Min(0f)]
     public float stoppingDistance = 0.5f;
 
-    NavMeshAgent agent;
 
     void Start()
     {
         agent = this.GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
+        gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         SetAgentDestination();
     }
 
@@ -29,13 +34,20 @@ public class AgentControl : MonoBehaviour
 
     void Update() {
         CheckDestinationReached();
+        DetectGaps();
     }
 
-    void CheckDestinationReached() {
+    void CheckDestinationReached()
+    {
         if (respawn && agent.remainingDistance <= agent.stoppingDistance)
         {
             this.origin.Respawn(agent.gameObject); 
         }
+    }
+
+    void DetectGaps()
+    {
+        gridComponent.grid.FindNearbyGaps(agent.gameObject.transform.position, gapDistance);
     }
 
 }

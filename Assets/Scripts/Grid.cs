@@ -76,11 +76,7 @@ public class Grid
                 Vector3 pos = GetWorldPosition(x, y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 pos.y = 0.1f;
                 Collider[] hitColliders = Physics.OverlapBox(pos, new Vector3(cellSize / 2, 0, cellSize / 2), Quaternion.identity);
-                // Debug.Log("colliders for " + x + ", " + y + " (" + hitColliders.GetLength(0) + ")");
-                //for (int i = 0; i < hitColliders.GetLength(0); i++)
-                //{
-                //    Debug.Log(hitColliders[i]);
-                //}
+
                 if (hitColliders.GetLength(0) > 0) {
                     SetValue(x, y, 1);
                 } else
@@ -91,8 +87,7 @@ public class Grid
         }
     }
 
-    public void FindNearbyGaps(int x, int y, float dist)
+    public void FindNearbyGaps(Vector3 pos, float searchDist)
     {
-        GameObject plane = GameObject.Find("Plane");
     }
 }
