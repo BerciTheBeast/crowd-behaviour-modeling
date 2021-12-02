@@ -104,6 +104,7 @@ public class Grid
             Debug.Log(state);
             state = "";
         }
+        Debug.Log("-------------------");
 
         List<Vector2> seedPoints = explorationArea.OrderBy(arg => System.Guid.NewGuid()).Take(seeds).ToList();
         List<Gap> detectedGaps = new List<Gap>();

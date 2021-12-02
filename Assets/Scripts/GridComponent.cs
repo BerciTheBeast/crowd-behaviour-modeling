@@ -19,7 +19,7 @@ public class GridComponent : MonoBehaviour
         grid.UpdateOccupancy();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         grid.UpdateOccupancy();
     }

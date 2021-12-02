@@ -36,6 +36,7 @@ public class AgentControl : MonoBehaviour
 
     void Update() {
         CheckDestinationReached();
+        DetectGaps();
     }
 
     void CheckDestinationReached()
