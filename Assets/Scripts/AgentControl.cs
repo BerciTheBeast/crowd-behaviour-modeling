@@ -12,6 +12,8 @@ public class AgentControl : MonoBehaviour
     public SpawnPoint origin;
     
     [Min(1)]
+    public int seeds;
+    [Min(1)]
     public int gapDistance = 5;
     public bool respawn = true;
     [Min(0f)]
@@ -24,7 +26,6 @@ public class AgentControl : MonoBehaviour
         agent.stoppingDistance = stoppingDistance;
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         SetAgentDestination();
-        DetectGaps();
     }
 
     public void SetAgentDestination()
@@ -46,8 +47,8 @@ public class AgentControl : MonoBehaviour
     }
 
     void DetectGaps()
-    {
-        gridComponent.grid.FindNearbyGaps(agent.gameObject.transform.position, gapDistance);
+    {   
+        gridComponent.grid.DetectGaps(agent.gameObject.transform.position, gapDistance, seeds);
     }
 
 }

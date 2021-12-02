@@ -85,9 +85,9 @@ public class SpawnPoint : MonoBehaviour
     IEnumerator GenerateAgents()
     {
         yield return new WaitForSeconds(0.5f);
-        for (var i = 0; i < agentCount; i += spawnAtTime)
+        for (var i = 0; i < agentCount;)
         {
-            for (var j = 0; j < spawnAtTime; j++)
+            for (var j = 0; j < spawnAtTime && i < agentCount; j++, i++)
             {
                 GenerateNewAgent(); //go through each corner and set that to the line renderer's position
             }
