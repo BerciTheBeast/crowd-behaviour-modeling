@@ -24,11 +24,11 @@ public class Grid
 
     }
 
-    private Vector3 GetWorldPosition(int x, int y) {
+    public Vector3 GetWorldPosition(int x, int y) {
         return new Vector3(x, 0, y) * cellSize + originPosition;
     }
 
-    private void GetXY(Vector3 worldPosition, out int x, out int y)
+    public void GetXY(Vector3 worldPosition, out int x, out int y)
     {
         x = Mathf.FloorToInt((worldPosition - originPosition).x / cellSize);
         y = Mathf.FloorToInt((worldPosition - originPosition).z / cellSize);
@@ -87,24 +87,19 @@ public class Grid
         }
     }
 
-    public List<Gap> DetectGaps(Vector3 pos, int searchDist, int seeds)
+    public List<Gap> GapDetection(Vector3 pos, int searchDist, int seeds)
     {        
         int x, y;
         GetXY(pos, out x, out y);
 
         List<Vector2> explorationArea = new List<Vector2>();
-        string state = "";
         for (int i = Mathf.Max(0, x - searchDist); i < Mathf.Min(width, x + searchDist); i ++)
         {
             for (int j = Mathf.Max(0, y - searchDist); j < Mathf.Min(height, y + searchDist); j ++)
             {
-                state += GetValue(i, j).ToString();
                 if (GetValue(i, j) == 0) explorationArea.Add(new Vector2(i, j));
             }
-            Debug.Log(state);
-            state = "";
         }
-        Debug.Log("-------------------");
 
         List<Vector2> seedPoints = explorationArea.OrderBy(arg => System.Guid.NewGuid()).Take(seeds).ToList();
         List<Gap> detectedGaps = new List<Gap>();
@@ -125,7 +120,7 @@ public class Grid
             // Expand gap up - Y coordinate of P1.
             while (true)
             {   
-                if (CheckExpand(gap.p1[0], seed[0], gap.p1[1] + 1, explorationArea, true))
+                if (CheckGapExpand(gap.p1[0], seed[0], gap.p1[1] + 1, explorationArea, true))
                     gap.p1[1]++;
                 else
                     break;
@@ -134,7 +129,7 @@ public class Grid
             // Expand gap right - X coordinate of P2.
             while (true)
             {
-                if (CheckExpand(gap.p2[1], gap.p1[1], gap.p2[0] + 1, explorationArea, false))
+                if (CheckGapExpand(gap.p2[1], gap.p1[1], gap.p2[0] + 1, explorationArea, false))
                     gap.p2[0]++;
                 else
                     break;
@@ -143,19 +138,20 @@ public class Grid
             // Expand gap down - Y coordinate of P2.
             while (true)
             {
-                if (CheckExpand(gap.p1[0], gap.p2[0], gap.p2[1] - 1, explorationArea, true))
+                if (CheckGapExpand(gap.p1[0], gap.p2[0], gap.p2[1] - 1, explorationArea, true))
                     gap.p2[1]--;
                 else
                     break;
             }
 
-            detectedGaps.Add(gap);
+            if (!IncludesGap(detectedGaps, gap))
+                detectedGaps.Add(gap);
         }
 
         return detectedGaps;
     }
 
-    public bool CheckExpand(float start, float stop, float len, List<Vector2> explorationArea, bool row)
+    private bool CheckGapExpand(float start, float stop, float len, List<Vector2> explorationArea, bool row)
     {
         for (float i = start; i <= stop; i++)
         {
@@ -173,5 +169,17 @@ public class Grid
             }
         }
         return true;
+    }
+
+    private bool IncludesGap(List<Gap> gaps, Gap gap)
+    {
+        foreach (Gap g in gaps)
+        {
+            if (g.IsEqual(gap))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

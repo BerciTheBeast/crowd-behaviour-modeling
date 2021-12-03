@@ -15,4 +15,12 @@ public class Gap
         this.p1 = p1;
         this.p2 = p2;
     }
+
+    public bool IsEqual(Gap gap) {
+        return gap.p1 == this.p1 && gap.p2 == this.p2;
+    }
+
+    public Vector2 GetCenter() {
+        return new Vector2((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2 );
+    }
 }

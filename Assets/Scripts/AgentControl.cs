@@ -3,21 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum AgentBehaviourType
+{
+    Default,
+    GapSeeking,
+    Following,
+    StopAndGo,
+    Overtagking
+}
+
 public class AgentControl : MonoBehaviour
 {
     private GridComponent gridComponent;
+    private Grid grid;
     private NavMeshAgent agent;
 
     public Vector3 destination;
     public SpawnPoint origin;
     
-    [Min(1)]
-    public int seeds;
-    [Min(1)]
-    public int gapDistance = 5;
     public bool respawn = true;
+    [Min(1)]
+    public int seeds = 3;
+    [Min(1)]
+    public int gapSearchArea = 5;
+    [Min(1.0f)]
+    public float visionRadius = 2.5f;
+    public int visionAngle = 120;
     [Min(0f)]
     public float stoppingDistance = 0.5f;
+
+    public AgentBehaviourType behaviour = AgentBehaviourType.Default;
 
 
     void Start()
@@ -25,6 +40,8 @@ public class AgentControl : MonoBehaviour
         agent = this.GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
+        grid = gridComponent.grid;
+        visionRadius = gapSearchArea / 2;
         SetAgentDestination();
     }
 
@@ -36,7 +53,7 @@ public class AgentControl : MonoBehaviour
 
     void Update() {
         CheckDestinationReached();
-        DetectGaps();
+        GapSeeking();
     }
 
     void CheckDestinationReached()
@@ -47,9 +64,31 @@ public class AgentControl : MonoBehaviour
         }
     }
 
-    void DetectGaps()
-    {   
-        gridComponent.grid.DetectGaps(agent.gameObject.transform.position, gapDistance, seeds);
+
+    void GapSeeking()
+    {
+        List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
+        gaps = GapSelection(gaps);
+    }
+
+    public List<Gap> GapSelection(List<Gap> gaps)
+    {
+        Vector3 agentPos = agent.gameObject.transform.position;
+
+        // 1. Filter gaps that are in agent's field of vision.
+        for (int i = gaps.Count - 1; i >= 0; i--)
+        {
+            Gap gap = gaps[i];
+            Vector2 gapCenter = gap.GetCenter();
+            Vector3 p = grid.GetWorldPosition((int)gapCenter[0], (int)gapCenter[1]) - agentPos;
+
+            if (p.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, p) > (visionAngle / 2))
+            {
+                gaps.RemoveAt(i);
+            }
+        }
+
+        return gaps;
     }
 
 }

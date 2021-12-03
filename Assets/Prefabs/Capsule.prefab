@@ -137,9 +137,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destination: {x: 0, y: 0, z: 0}
   origin: {fileID: 0}
-  gapDistance: 5
   respawn: 1
+  seeds: 2
+  gapSearchArea: 5
+  visionRadius: 2.5
+  visionAngle: 120
   stoppingDistance: 0.5
+  behaviour: 0
 --- !u!120 &2518359526414878470
 LineRenderer:
   m_ObjectHideFlags: 0
