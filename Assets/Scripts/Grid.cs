@@ -146,6 +146,8 @@ public class Grid
 
             if (!IncludesGap(detectedGaps, gap))
                 detectedGaps.Add(gap);
+
+            // Debug.Log("detectedGaps: " + detectedGaps.Count);
         }
 
         return detectedGaps;

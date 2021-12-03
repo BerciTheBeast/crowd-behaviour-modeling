@@ -41,7 +41,6 @@ public class AgentControl : MonoBehaviour
         agent.stoppingDistance = stoppingDistance;
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         grid = gridComponent.grid;
-        visionRadius = gapSearchArea / 2;
         SetAgentDestination();
     }
 
@@ -86,6 +85,22 @@ public class AgentControl : MonoBehaviour
             {
                 gaps.RemoveAt(i);
             }
+        }
+
+        // 2. Filter gaps that are too small for our agent.
+        for (int i = gaps.Count - 1; i >= 0; i--)
+        {
+            Gap gap = gaps[i];
+            Vector3 p1 = grid.GetWorldPosition(gap.p1[0], gap.p1[1]);
+            Vector3 p2 = grid.GetWorldPosition(gap.p2[0], gap.p2[1]);
+            float gapWidth = Mathf.Abs(p1[0] - p2[0]);
+            float gapHeight = Mathf.Abs(p2[0] - p2[0]);
+
+            if (Mathf.Min(gapWidth, gapHeight) < 2 * agent.radius)
+            {
+                gaps.RemoveAt(i);
+            }
+            
         }
 
         return gaps;
