@@ -82,6 +82,9 @@ public class AgentControl : MonoBehaviour
     {
         Vector3 agentPos = agent.gameObject.transform.position;
 
+        Vector3 agentToDestination = destination - agentPos;
+        agentToDestination.y = 0;
+
         print("Gaps: " + gaps.Count);
 
 
@@ -90,7 +93,9 @@ public class AgentControl : MonoBehaviour
         {
             Gap gap = gaps[i];
             Vector2 gapCenter = gap.GetCenter();
-            gap.agentToCenter = grid.GetWorldPosition((int)gapCenter[0], (int)gapCenter[1]) - agentPos;
+            Vector3 gapCenterWorld = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
+            gap.agentToCenter = gapCenterWorld - agentPos;
+            gap.agentToCenter.y = 0;
 
             if (gap.agentToCenter.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, gap.agentToCenter) > (visionAngle / 2))
             {
@@ -118,8 +123,7 @@ public class AgentControl : MonoBehaviour
         // 3. Filter gaps would lead agent away from its destination.
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
-            print("angle: " + Vector3.Angle(destination, gaps[i].GetCenter()));
-            if (Vector3.Angle(destination, gaps[i].GetCenter()) > destinationTresholdAngle)
+            if (Vector3.Angle(agentToDestination, gaps[i].agentToCenter) > destinationTresholdAngle)
             {
                 gaps.RemoveAt(i);
             }
@@ -132,11 +136,11 @@ public class AgentControl : MonoBehaviour
         // Finally select the gap that has the minimum angle between the gap and the destination.
         if (gaps.Count > 0) {
             Gap selectedGap = gaps[0];
-            float minAngle = Vector3.Angle(destination, selectedGap.GetCenter());
+            float minAngle = Vector3.Angle(agentToDestination, selectedGap.agentToCenter);
 
             foreach (Gap gap in gaps)
             {
-                float angle = Vector3.Angle(destination, gap.GetCenter());
+                float angle = Vector3.Angle(agentToDestination, gap.agentToCenter);
                 if (angle < minAngle)
                 {
                     selectedGap = gap;
