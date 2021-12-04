@@ -147,7 +147,7 @@ public class AgentControl : MonoBehaviour
                     minAngle = angle;
                 }
             }
-
+            grid.DetectLimiters(selectedGap).Where(obj => obj != gameObject).ToList();
             return selectedGap;
         }
 
