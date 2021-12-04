@@ -118,8 +118,8 @@ public class AgentControl : MonoBehaviour
         // 3. Filter gaps would lead agent away from its destination.
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
-            print("angle: " + Vector3.Angle(destination, gaps[i].agentToCenter));
-            if (Vector3.Angle(destination, gaps[i].agentToCenter) > destinationTresholdAngle)
+            print("angle: " + Vector3.Angle(destination, gaps[i].GetCenter()));
+            if (Vector3.Angle(destination, gaps[i].GetCenter()) > destinationTresholdAngle)
             {
                 gaps.RemoveAt(i);
             }
@@ -132,11 +132,11 @@ public class AgentControl : MonoBehaviour
         // Finally select the gap that has the minimum angle between the gap and the destination.
         if (gaps.Count > 0) {
             Gap selectedGap = gaps[0];
-            float minAngle = Vector3.Angle(destination, selectedGap.agentToCenter);
+            float minAngle = Vector3.Angle(destination, selectedGap.GetCenter());
 
             foreach (Gap gap in gaps)
             {
-                float angle = Vector3.Angle(destination, gap.agentToCenter);
+                float angle = Vector3.Angle(destination, gap.GetCenter());
                 if (angle < minAngle)
                 {
                     selectedGap = gap;
