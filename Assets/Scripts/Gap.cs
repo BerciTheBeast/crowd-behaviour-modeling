@@ -23,6 +23,6 @@ public class Gap
     }
 
     public Vector2 GetCenter() {
-        return new Vector2((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2 );
+        return new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2 );
     }
 }
