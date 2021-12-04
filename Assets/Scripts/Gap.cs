@@ -10,6 +10,8 @@ public class Gap
     // Coordinates of the right bottom point.
     public Vector2 p2;
 
+    public Vector3 agentToCenter;
+
     public Gap(Vector2 p1, Vector2 p2)
     {
         this.p1 = p1;

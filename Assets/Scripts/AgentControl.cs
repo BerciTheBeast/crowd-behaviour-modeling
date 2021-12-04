@@ -28,9 +28,11 @@ public class AgentControl : MonoBehaviour
     public int gapSearchArea = 5;
     [Min(1.0f)]
     public float visionRadius = 2.5f;
-    public int visionAngle = 120;
+    public float visionAngle = 120.0f;
     [Min(0f)]
     public float stoppingDistance = 0.5f;
+
+    public float destinationTresholdAngle = 78.0f;
 
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
 
@@ -52,7 +54,7 @@ public class AgentControl : MonoBehaviour
 
     void Update() {
         CheckDestinationReached();
-        GapSeeking();
+        GapSeekingBehaviour();
     }
 
     void CheckDestinationReached()
@@ -64,46 +66,88 @@ public class AgentControl : MonoBehaviour
     }
 
 
-    void GapSeeking()
+    void GapSeekingBehaviour()
     {
         List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
-        gaps = GapSelection(gaps);
+        Gap selectedGap = GapSelection(gaps);
+        print(selectedGap);
+
+        if (selectedGap != null)
+        {
+            // Perform gap seeking.
+        }
     }
 
-    public List<Gap> GapSelection(List<Gap> gaps)
+    public Gap GapSelection(List<Gap> gaps)
     {
         Vector3 agentPos = agent.gameObject.transform.position;
+
+        print("Gaps: " + gaps.Count);
+
 
         // 1. Filter gaps that are in agent's field of vision.
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
             Gap gap = gaps[i];
             Vector2 gapCenter = gap.GetCenter();
-            Vector3 p = grid.GetWorldPosition((int)gapCenter[0], (int)gapCenter[1]) - agentPos;
+            gap.agentToCenter = grid.GetWorldPosition((int)gapCenter[0], (int)gapCenter[1]) - agentPos;
 
-            if (p.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, p) > (visionAngle / 2))
+            if (gap.agentToCenter.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, gap.agentToCenter) > (visionAngle / 2))
             {
                 gaps.RemoveAt(i);
             }
         }
+        print("Gaps after 1: " + gaps.Count);
 
         // 2. Filter gaps that are too small for our agent.
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
             Gap gap = gaps[i];
-            Vector3 p1 = grid.GetWorldPosition(gap.p1[0], gap.p1[1]);
-            Vector3 p2 = grid.GetWorldPosition(gap.p2[0], gap.p2[1]);
+            Vector3 p1 = grid.GetWorldPosition((int)gap.p1[0], (int)gap.p1[1]);
+            Vector3 p2 = grid.GetWorldPosition((int)gap.p2[0], (int)gap.p2[1]);
             float gapWidth = Mathf.Abs(p1[0] - p2[0]);
-            float gapHeight = Mathf.Abs(p2[0] - p2[0]);
+            float gapHeight = Mathf.Abs(p1[0] - p2[0]);
 
             if (Mathf.Min(gapWidth, gapHeight) < 2 * agent.radius)
             {
                 gaps.RemoveAt(i);
             }
-            
+        }
+        print("Gaps after 2: " + gaps.Count);
+
+        // 3. Filter gaps would lead agent away from its destination.
+        for (int i = gaps.Count - 1; i >= 0; i--)
+        {
+            print("angle: " + Vector3.Angle(destination, gaps[i].agentToCenter));
+            if (Vector3.Angle(destination, gaps[i].agentToCenter) > destinationTresholdAngle)
+            {
+                gaps.RemoveAt(i);
+            }
+        }
+        print("Gaps after 3: " + gaps.Count);
+
+        // 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
+
+
+        // Finally select the gap that has the minimum angle between the gap and the destination.
+        if (gaps.Count > 0) {
+            Gap selectedGap = gaps[0];
+            float minAngle = Vector3.Angle(destination, selectedGap.agentToCenter);
+
+            foreach (Gap gap in gaps)
+            {
+                float angle = Vector3.Angle(destination, gap.agentToCenter);
+                if (angle < minAngle)
+                {
+                    selectedGap = gap;
+                    minAngle = angle;
+                }
+            }
+
+            return selectedGap;
         }
 
-        return gaps;
+        return null;
     }
 
 }
