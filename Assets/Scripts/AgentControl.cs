@@ -17,7 +17,6 @@ public class AgentControl : MonoBehaviour
     private GridComponent gridComponent;
     private Grid grid;
     private NavMeshAgent agent;
-
     public Vector3 destination;
     public SpawnPoint origin;
     
@@ -31,11 +30,8 @@ public class AgentControl : MonoBehaviour
     public float visionAngle = 120.0f;
     [Min(0f)]
     public float stoppingDistance = 0.5f;
-
     public float destinationTresholdAngle = 78.0f;
-
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
-
 
     void Start()
     {
@@ -81,11 +77,8 @@ public class AgentControl : MonoBehaviour
     public Gap GapSelection(List<Gap> gaps)
     {
         Vector3 agentPos = agent.gameObject.transform.position;
-
         Vector3 agentToDestination = destination - agentPos;
         agentToDestination.y = 0;
-
-        print("Gaps: " + gaps.Count);
 
 
         // 1. Filter gaps that are in agent's field of vision.
@@ -102,23 +95,21 @@ public class AgentControl : MonoBehaviour
                 gaps.RemoveAt(i);
             }
         }
-        print("Gaps after 1: " + gaps.Count);
 
         // 2. Filter gaps that are too small for our agent.
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
             Gap gap = gaps[i];
-            Vector3 p1 = grid.GetWorldPosition((int)gap.p1[0], (int)gap.p1[1]);
-            Vector3 p2 = grid.GetWorldPosition((int)gap.p2[0], (int)gap.p2[1]);
-            float gapWidth = Mathf.Abs(p1[0] - p2[0]);
-            float gapHeight = Mathf.Abs(p1[0] - p2[0]);
+            Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
+            Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
+            float gapWidth = Mathf.Abs(p1.x - p2.x);
+            float gapHeight = Mathf.Abs(p1.z - p2.z);
 
             if (Mathf.Min(gapWidth, gapHeight) < 2 * agent.radius)
             {
                 gaps.RemoveAt(i);
             }
         }
-        print("Gaps after 2: " + gaps.Count);
 
         // 3. Filter gaps would lead agent away from its destination.
         for (int i = gaps.Count - 1; i >= 0; i--)
@@ -128,7 +119,6 @@ public class AgentControl : MonoBehaviour
                 gaps.RemoveAt(i);
             }
         }
-        print("Gaps after 3: " + gaps.Count);
 
         // 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
 

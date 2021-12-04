@@ -109,8 +109,6 @@ public class Grid
 
         List<Vector2> seedPoints = explorationArea.OrderBy(arg => System.Guid.NewGuid()).Take(seeds).ToList();
         List<Gap> detectedGaps = new List<Gap>();
-        int seedCount = 0;
-        Debug.Log("Seedpoints: " + seedPoints.Count);
         foreach (Vector2 seed in seedPoints)
         {
             Gap gap = new Gap(seed, seed);
@@ -118,8 +116,8 @@ public class Grid
             // Expand gap to the left - X coordinate of P1.
             while (true)
             {
-                if (explorationArea.Contains(new Vector2(gap.p1[0] - 1, gap.p1[1])))
-                    gap.p1[0]--;
+                if (explorationArea.Contains(new Vector2(gap.p1.x - 1, gap.p1.y)))
+                    gap.p1.x--;
                 else
                     break;
             }
@@ -127,8 +125,8 @@ public class Grid
             // Expand gap up - Y coordinate of P1.
             while (true)
             {   
-                if (CheckGapExpand(gap.p1[0], seed[0], gap.p1[1] + 1, explorationArea, true))
-                    gap.p1[1]++;
+                if (CheckGapExpand(gap.p1.x, seed[0], gap.p1.y + 1, explorationArea, true))
+                    gap.p1.y++;
                 else
                     break;
             }
@@ -136,8 +134,8 @@ public class Grid
             // Expand gap right - X coordinate of P2.
             while (true)
             {
-                if (CheckGapExpand(gap.p2[1], gap.p1[1], gap.p2[0] + 1, explorationArea, false))
-                    gap.p2[0]++;
+                if (CheckGapExpand(gap.p2.y, gap.p1.y, gap.p2.x + 1, explorationArea, false))
+                    gap.p2.x++;
                 else
                     break;
             }
@@ -145,8 +143,8 @@ public class Grid
             // Expand gap down - Y coordinate of P2.
             while (true)
             {
-                if (CheckGapExpand(gap.p1[0], gap.p2[0], gap.p2[1] - 1, explorationArea, true))
-                    gap.p2[1]--;
+                if (CheckGapExpand(gap.p1.x, gap.p2.x, gap.p2.y - 1, explorationArea, true))
+                    gap.p2.y--;
                 else
                     break;
             }
@@ -154,9 +152,7 @@ public class Grid
             if (!IncludesGap(detectedGaps, gap))
                 detectedGaps.Add(gap);
 
-            // Debug.Log("detectedGaps: " + detectedGaps.Count);
         }
-        Debug.Log("gaps: " + detectedGaps.Count);
 
         return detectedGaps;
     }
