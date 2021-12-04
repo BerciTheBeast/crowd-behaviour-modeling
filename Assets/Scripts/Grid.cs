@@ -73,9 +73,7 @@ public class Grid
         {
             for (int y = 0; y < gridArray.GetLength(1); y++)
             {
-                Vector3 pos = GetWorldPosition(x, y) + new Vector3(cellSize / 2, 0, cellSize / 2);
-                pos.y = 0.1f;
-                Collider[] hitColliders = Physics.OverlapBox(pos, new Vector3(cellSize / 2, 0, cellSize / 2), Quaternion.identity);
+                Collider[] hitColliders = GetPositionColliders(x, y);
 
                 if (hitColliders.GetLength(0) > 0) {
                     SetValue(x, y, 1);
@@ -85,6 +83,14 @@ public class Grid
                 }
             }
         }
+    }
+
+    public Collider[] GetPositionColliders(int x, int y)
+    {
+        Vector3 pos = GetWorldPosition(x, y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+        pos.y = 0.1f;
+        Collider[] hitColliders = Physics.OverlapBox(pos, new Vector3(cellSize / 2, 0, cellSize / 2), Quaternion.identity);
+        return hitColliders;
     }
 
     public List<Gap> DetectGaps(Vector3 pos, int searchDist, int seeds)
@@ -109,6 +115,7 @@ public class Grid
         List<Vector2> seedPoints = explorationArea.OrderBy(arg => System.Guid.NewGuid()).Take(seeds).ToList();
         List<Gap> detectedGaps = new List<Gap>();
         int seedCount = 0;
+        Debug.Log("Seedpoints: " + seedPoints.Count);
         foreach (Vector2 seed in seedPoints)
         {
             Gap gap = new Gap(seed, seed);
@@ -151,6 +158,7 @@ public class Grid
 
             detectedGaps.Add(gap);
         }
+        Debug.Log("gaps: " + detectedGaps.Count);
 
         return detectedGaps;
     }
@@ -174,4 +182,46 @@ public class Grid
         }
         return true;
     }
+    /*
+    public List<GameObject> detectLimiters(Gap gap)
+    {
+
+        HashSet<GameObject> limiters = new HashSet<GameObject>();
+
+        // if top side in bounds
+        if (gap.p1.y + 1 < height)
+        {
+            // compute start and stop index within bounds & loop
+            int start = (int)Mathf.Max(gap.p1.x, 0);
+            int stop = (int)Mathf.MIN(gap.p2.x, width - 1);
+            for (int x = start; x <= stop; x++)
+            {
+                // detect colliders
+                Collider[] hitColliders = GetPositionColliders(x, gap.p1.y + 1);
+                // extract game objects and add to set
+                foreach (Collider col in hitColliders)
+                {
+                    limiters.Add(col.GameObject)
+                }
+            }
+
+        }
+        // if right side in bounds
+        if (gap.p2.x + 1 < width)
+        {
+
+        }
+        // if bottom side in bounds
+        if (gap.p2.y - 1 >= 0)
+        {
+
+        }
+        // if left side in bounds
+        if (gap.p1.x - 1 >= 0)
+        {
+
+        }
+
+    }
+    */
 }
