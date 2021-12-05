@@ -11,10 +11,10 @@ public class PathRendering : MonoBehaviour
     public bool visible = true;
 
     void Start()
-        {
-            line = this.GetComponent<LineRenderer>(); //get the line renderer
-            agent = this.GetComponent<NavMeshAgent>(); //get the agent
-        }
+    {
+        line = this.GetComponent<LineRenderer>(); //get the line renderer
+        agent = this.GetComponent<NavMeshAgent>(); //get the agent
+    }
 
 
     void Update()

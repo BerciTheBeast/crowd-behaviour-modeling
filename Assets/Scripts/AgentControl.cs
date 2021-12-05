@@ -77,10 +77,10 @@ public class AgentControl : MonoBehaviour
         {
             List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
             Gap selectedGap = GapSelection(gaps);
-            print(selectedGap);
 
             if (selectedGap != null)
             {
+                DrawGap(selectedGap);
                 GapSeeking(selectedGap);
             }
         } else if (ShouldEndSeeking())
@@ -118,8 +118,10 @@ public class AgentControl : MonoBehaviour
             Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
             float gapWidth = Mathf.Abs(p1.x - p2.x);
             float gapHeight = Mathf.Abs(p1.z - p2.z);
+            Vector3 agentScale = agent.gameObject.transform.localScale;
 
-            if (Mathf.Min(gapWidth, gapHeight) < 2 * agent.radius)
+            print(agent.radius * Mathf.Max(agentScale.x, agentScale.z));
+            if (Mathf.Min(gapWidth, gapHeight) < 2 * (agent.radius * Mathf.Max(agentScale.x, agentScale.z)))
             {
                 gaps.RemoveAt(i);
             }
@@ -160,12 +162,12 @@ public class AgentControl : MonoBehaviour
     {
         isSeeking = true;
         seekingStart = Time.time;
-        // Perform gap seeking.
-        // Get limiter objects
+
+        // Get limiter objects.
         Debug.Log("Get limiter objects");
         List<GameObject> limiterList = grid.DetectLimiters(gap).FindAll(obj => obj != gameObject);
 
-        // Calculate gap speed
+        // Calculate gap speed.
         Debug.Log("Calculate gap speed for limiter count: " + limiterList.Count);
         Vector3 gapSpeed = new Vector3(0, 0, 0);
         if (limiterList.Count > 0)
@@ -178,16 +180,16 @@ public class AgentControl : MonoBehaviour
         }
         Debug.Log("Gap speed: " + gapSpeed);
 
-        // Determine seeking time
+        // Determine seeking time.
         float gapSeekerSpeed = GetGapSeekerSpeed(GetGapArea(gap));
         float agentToGapCenterMagnitude = gap.agentToCenter.magnitude;
         float seekingTime = agentToGapCenterMagnitude / gapSeekerSpeed;
 
-        // Calulate gap position in the future
+        // Calculate gap position in the future.
         Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
         Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
 
-        // Set new agent destination
+        // Set new agent destination.
         seekingEnd = seekingStart + seekingTime;
         agent.SetDestination(gapDestination);
     }
@@ -220,5 +222,16 @@ public class AgentControl : MonoBehaviour
     {
         agent.SetDestination(destination);
         isSeeking = false;
+    }
+
+     public void DrawGap(Gap gap)
+    {
+        Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
+        Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
+
+        Debug.DrawLine(new Vector3(p1.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p1.z), Color.green, 2.5f);
+        Debug.DrawLine(new Vector3(p2.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), Color.green, 2.5f);
+        Debug.DrawLine(new Vector3(p2.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p2.z), Color.green, 2.5f);
+        Debug.DrawLine(new Vector3(p1.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p1.z), Color.green, 2.5f);
     }
 }
