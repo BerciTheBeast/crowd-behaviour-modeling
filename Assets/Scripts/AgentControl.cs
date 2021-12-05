@@ -34,9 +34,9 @@ public class AgentControl : MonoBehaviour
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
     [Range(0.000001f, 1f)]
-    public float alpha = 0.5;
+    public float alpha = 0.5f;
     [Min(0f)]
-    public float beta = 0.75;
+    public float beta = 0.75f;
 
     void Start()
     {
@@ -76,32 +76,7 @@ public class AgentControl : MonoBehaviour
 
         if (selectedGap != null)
         {
-            // Perform gap seeking.
-            // Get limiter objects
-            Debug.Log("Get limiter objects");
-            List<GameObject> limiterList = grid.DetectLimiters(selectedGap).FindAll(obj => obj != gameObject);
-
-            // Calculate gap speed
-            Debug.Log("Calculate gap speed for limiter count: " + limiterList.Count);
-            Vector3 gapSpeed = new Vector3(0, 0, 0);
-            if (limiterList.Count > 0)
-            {
-                foreach(GameObject obj in limiterList)
-                {
-                    gapSpeed += obj.GetComponent<NavMeshAgent>().velocity;
-                }
-                gapSpeed = gapSpeed / limiterList.Count;
-            }
-            Debug.Log("Gap speed: " + gapSpeed);
-
-            // Determine seeking time
-            float gapSeekerSpeed = GetGapSeekerSpeed(GetGapArea(selectedGap));
-            float agentToGapCenterMagnitude = gap.agentToCenter.magnitude;
-            float seekingTime = agentToGapCenterMagnitude / gapSeekerSpeed;
-
-            // Calulate gap position in the future
-            Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
-            Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
+            GapSeeking(selectedGap);
         }
     }
 
@@ -172,6 +147,38 @@ public class AgentControl : MonoBehaviour
         return null;
     }
 
+    public void GapSeeking(Gap gap)
+    {
+        // Perform gap seeking.
+        // Get limiter objects
+        Debug.Log("Get limiter objects");
+        List<GameObject> limiterList = grid.DetectLimiters(gap).FindAll(obj => obj != gameObject);
+
+        // Calculate gap speed
+        Debug.Log("Calculate gap speed for limiter count: " + limiterList.Count);
+        Vector3 gapSpeed = new Vector3(0, 0, 0);
+        if (limiterList.Count > 0)
+        {
+            foreach (GameObject obj in limiterList)
+            {
+                gapSpeed += obj.GetComponent<NavMeshAgent>().velocity;
+            }
+            gapSpeed = gapSpeed / limiterList.Count;
+        }
+        Debug.Log("Gap speed: " + gapSpeed);
+
+        // Determine seeking time
+        float gapSeekerSpeed = GetGapSeekerSpeed(GetGapArea(gap));
+        float agentToGapCenterMagnitude = gap.agentToCenter.magnitude;
+        float seekingTime = agentToGapCenterMagnitude / gapSeekerSpeed;
+
+        // Calulate gap position in the future
+        Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
+        Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
+
+        // TODO: change destination while seeking & change back when done
+    }
+
     private float GetGapArea(Gap gap)
     {
         Vector3 topLeft = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
@@ -183,8 +190,8 @@ public class AgentControl : MonoBehaviour
 
     private float GetGapSeekerSpeed(float gapArea)
     {
-        float smin = 4 * Math.Pow(agent.radius, 2);
-        return this.agent.speed / (1 + Math.Exp(-beta * (gapArea - alpha * smin)));
+        float smin = 4 * Mathf.Pow(agent.radius, 2);
+        return this.agent.speed / (1 + Mathf.Exp(-beta * (gapArea - alpha * smin)));
     }
 
 }
