@@ -232,6 +232,8 @@ public class AgentControl : MonoBehaviour
         Vector3 startToAgent = agent.gameObject.transform.position - startingPosition;
         startToAgent.y = 0;
         float probability = lambda * agentToDestination.magnitude / startToAgent.magnitude;
+        // Debug.Log("Dist to start, end, ratio (end/start): " + startToAgent.magnitude + ", " + agentToDestination.magnitude + ", " + agentToDestination.magnitude / startToAgent.magnitude);
+        // Debug.Log("Gap seeking probability: " + Mathf.Clamp(probability, 0, 1));
         return Mathf.Clamp(probability, 0, 1);
     }
 }
