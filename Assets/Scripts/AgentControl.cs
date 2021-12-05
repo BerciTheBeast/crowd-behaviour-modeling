@@ -68,7 +68,7 @@ public class AgentControl : MonoBehaviour
     {
         if (behaviour == AgentBehaviourType.Default && respawn && agent.remainingDistance <= agent.stoppingDistance)
         {
-            this.origin.Respawn(agent.gameObject); 
+            this.origin.Respawn(agent.gameObject);
         }
     }
 
