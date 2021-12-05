@@ -37,6 +37,9 @@ public class AgentControl : MonoBehaviour
     public float alpha = 0.5f;
     [Min(0f)]
     public float beta = 0.75f;
+    private bool isSeeking = false;
+    private float seekingStart;
+    private float seekingEnd;
 
     void Start()
     {
@@ -61,7 +64,7 @@ public class AgentControl : MonoBehaviour
 
     void CheckDestinationReached()
     {
-        if (respawn && agent.remainingDistance <= agent.stoppingDistance)
+        if (!isSeeking && respawn && agent.remainingDistance <= agent.stoppingDistance)
         {
             this.origin.Respawn(agent.gameObject); 
         }
@@ -70,13 +73,19 @@ public class AgentControl : MonoBehaviour
 
     void GapSeekingBehaviour()
     {
-        List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
-        Gap selectedGap = GapSelection(gaps);
-        print(selectedGap);
-
-        if (selectedGap != null)
+        if (!isSeeking)
         {
-            GapSeeking(selectedGap);
+            List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
+            Gap selectedGap = GapSelection(gaps);
+            print(selectedGap);
+
+            if (selectedGap != null)
+            {
+                GapSeeking(selectedGap);
+            }
+        } else if (ShouldEndSeeking())
+        {
+            EndSeeking();
         }
     }
 
@@ -151,6 +160,8 @@ public class AgentControl : MonoBehaviour
 
     public void GapSeeking(Gap gap)
     {
+        isSeeking = true;
+        seekingStart = Time.time;
         // Perform gap seeking.
         // Get limiter objects
         Debug.Log("Get limiter objects");
@@ -178,7 +189,9 @@ public class AgentControl : MonoBehaviour
         Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
         Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
 
-        // TODO: change destination while seeking & change back when done
+        // Set new agent destination
+        seekingEnd = seekingStart + seekingTime;
+        agent.SetDestination(gapDestination);
     }
 
     private float GetGapArea(Gap gap)
@@ -196,4 +209,18 @@ public class AgentControl : MonoBehaviour
         return this.agent.speed / (1 + Mathf.Exp(-beta * (gapArea - alpha * smin)));
     }
 
+    private bool ShouldEndSeeking()
+    {
+        if (seekingEnd < Time.time || agent.remainingDistance <= agent.stoppingDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void EndSeeking()
+    {
+        agent.SetDestination(destination);
+        isSeeking = false;
+    }
 }
