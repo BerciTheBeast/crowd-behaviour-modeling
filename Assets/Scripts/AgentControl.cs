@@ -116,9 +116,8 @@ public class AgentControl : MonoBehaviour
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
             Gap gap = gaps[i];
-            Vector2 gapCenter = gap.GetCenter();
-            Vector3 gapCenterWorld = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
-            gap.agentToCenter = gapCenterWorld - agentPos;
+            Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
+            gap.agentToCenter = gapCenter - agentPos;
             gap.agentToCenter.y = 0;
 
             if (gap.agentToCenter.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, gap.agentToCenter) > (visionAngle / 2))
@@ -151,8 +150,7 @@ public class AgentControl : MonoBehaviour
             }
         }
 
-        // 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
-
+        // TODO: 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
 
         // Finally select the gap that has the minimum angle between the gap and the destination.
         if (gaps.Count > 0) {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class LineRendering : MonoBehaviour
+public class PathRendering : MonoBehaviour
 {
     LineRenderer line; //to hold the line Renderer
     Transform target; //to hold the transform of the target

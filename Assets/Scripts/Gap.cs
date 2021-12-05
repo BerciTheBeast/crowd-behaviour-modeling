@@ -21,8 +21,4 @@ public class Gap
     public bool IsEqual(Gap gap) {
         return gap.p1 == this.p1 && gap.p2 == this.p2;
     }
-
-    public Vector2 GetCenter() {
-        return new Vector2((p1.x + p2.x) / 2, (p1.y + p2.y) / 2 );
-    }
 }
