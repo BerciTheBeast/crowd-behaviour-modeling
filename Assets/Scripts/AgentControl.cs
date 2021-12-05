@@ -17,7 +17,7 @@ public class AgentControl : MonoBehaviour
     private GridComponent gridComponent;
     private Grid grid;
     private NavMeshAgent agent;
-    public Rigidbody rb;
+    public Vector3 startingPosition;
     public Vector3 destination;
     public SpawnPoint origin;
     
@@ -33,13 +33,15 @@ public class AgentControl : MonoBehaviour
     public float stoppingDistance = 0.5f;
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
+    private float seekingEnd;
+
+    // bounding coefficients
     [Range(0.000001f, 1f)]
     public float alpha = 0.5f;
     [Min(0f)]
     public float beta = 0.75f;
-    private bool isSeeking = false;
-    private float seekingStart;
-    private float seekingEnd;
+    [Min(1f)]
+    public float lambda = 2.3f;
 
     void Start()
     {
@@ -47,7 +49,7 @@ public class AgentControl : MonoBehaviour
         agent.stoppingDistance = stoppingDistance;
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         grid = gridComponent.grid;
-        rb = gameObject.GetComponent<Rigidbody>();
+        startingPosition = agent.gameObject.transform.position;
         SetAgentDestination();
     }
 
@@ -64,7 +66,7 @@ public class AgentControl : MonoBehaviour
 
     void CheckDestinationReached()
     {
-        if (!isSeeking && respawn && agent.remainingDistance <= agent.stoppingDistance)
+        if (behaviour == AgentBehaviourType.Default && respawn && agent.remainingDistance <= agent.stoppingDistance)
         {
             this.origin.Respawn(agent.gameObject); 
         }
@@ -73,7 +75,7 @@ public class AgentControl : MonoBehaviour
 
     void GapSeekingBehaviour()
     {
-        if (!isSeeking)
+        if (behaviour == AgentBehaviourType.Default && Random.value < GetGapSeekingProbability())
         {
             List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
             Gap selectedGap = GapSelection(gaps);
@@ -160,10 +162,9 @@ public class AgentControl : MonoBehaviour
 
     public void GapSeeking(Gap gap)
     {
-        isSeeking = true;
-        seekingStart = Time.time;
-
-        // Get limiter objects.
+        behaviour = AgentBehaviourType.GapSeeking;
+        // Perform gap seeking.
+        // Get limiter objects
         Debug.Log("Get limiter objects");
         List<GameObject> limiterList = grid.DetectLimiters(gap).FindAll(obj => obj != gameObject);
 
@@ -189,8 +190,8 @@ public class AgentControl : MonoBehaviour
         Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
         Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
 
-        // Set new agent destination.
-        seekingEnd = seekingStart + seekingTime;
+        // Set new agent destination
+        seekingEnd = Time.time + seekingTime;
         agent.SetDestination(gapDestination);
     }
 
@@ -221,7 +222,19 @@ public class AgentControl : MonoBehaviour
     private void EndSeeking()
     {
         agent.SetDestination(destination);
-        isSeeking = false;
+        behaviour = AgentBehaviourType.Default;
+    }
+
+    private float GetGapSeekingProbability()
+    {
+        Vector3 agentToDestination = destination - agent.gameObject.transform.position;
+        agentToDestination.y = 0;
+        Vector3 startToAgent = agent.gameObject.transform.position - startingPosition;
+        startToAgent.y = 0;
+        float probability = lambda * agentToDestination.magnitude / startToAgent.magnitude;
+        // Debug.Log("Dist to start, end, ratio (end/start): " + startToAgent.magnitude + ", " + agentToDestination.magnitude + ", " + agentToDestination.magnitude / startToAgent.magnitude);
+        // Debug.Log("Gap seeking probability: " + Mathf.Clamp(probability, 0, 1));
+        return Mathf.Clamp(probability, 0, 1);
     }
 
      public void DrawGap(Gap gap)

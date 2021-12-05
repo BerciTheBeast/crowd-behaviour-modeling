@@ -107,6 +107,7 @@ public class SpawnPoint : MonoBehaviour
     {
         capsule.transform.position = CalculateRandomPoint();
         capsule.GetComponent<AgentControl>().destination = destination.CalculateRandomPoint();
+        capsule.GetComponent<AgentControl>().startingPosition = capsule.transform.position;
         capsule.GetComponent<AgentControl>().SetAgentDestination();
     }
 }
