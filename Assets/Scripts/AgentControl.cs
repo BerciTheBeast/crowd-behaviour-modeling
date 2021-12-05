@@ -33,6 +33,10 @@ public class AgentControl : MonoBehaviour
     public float stoppingDistance = 0.5f;
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
+    [Range(0.000001f, 1f)]
+    public float alpha = 0.5;
+    [Min(0f)]
+    public float beta = 0.75;
 
     void Start()
     {
@@ -89,6 +93,15 @@ public class AgentControl : MonoBehaviour
                 gapSpeed = gapSpeed / limiterList.Count;
             }
             Debug.Log("Gap speed: " + gapSpeed);
+
+            // Determine seeking time
+            float gapSeekerSpeed = GetGapSeekerSpeed(GetGapArea(selectedGap));
+            float agentToGapCenterMagnitude = gap.agentToCenter.magnitude;
+            float seekingTime = agentToGapCenterMagnitude / gapSeekerSpeed;
+
+            // Calulate gap position in the future
+            Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
+            Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
         }
     }
 
@@ -159,6 +172,21 @@ public class AgentControl : MonoBehaviour
         }
 
         return null;
+    }
+
+    private float GetGapArea(Gap gap)
+    {
+        Vector3 topLeft = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
+        Vector3 bottomRight = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
+        float width = Mathf.Abs(bottomRight.x - topLeft.x);
+        float height = Mathf.Abs(topLeft.z - bottomRight.z);
+        return width * height;
+    }
+
+    private float GetGapSeekerSpeed(float gapArea)
+    {
+        float smin = 4 * Math.Pow(agent.radius, 2);
+        return this.agent.speed / (1 + Math.Exp(-beta * (gapArea - alpha * smin)));
     }
 
 }
