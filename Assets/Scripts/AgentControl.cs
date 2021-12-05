@@ -17,6 +17,7 @@ public class AgentControl : MonoBehaviour
     private GridComponent gridComponent;
     private Grid grid;
     private NavMeshAgent agent;
+    public Rigidbody rb;
     public Vector3 destination;
     public SpawnPoint origin;
     
@@ -39,6 +40,7 @@ public class AgentControl : MonoBehaviour
         agent.stoppingDistance = stoppingDistance;
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         grid = gridComponent.grid;
+        rb = gameObject.GetComponent<Rigidbody>();
         SetAgentDestination();
     }
 
@@ -71,6 +73,22 @@ public class AgentControl : MonoBehaviour
         if (selectedGap != null)
         {
             // Perform gap seeking.
+            // Get limiter objects
+            Debug.Log("Get limiter objects");
+            List<GameObject> limiterList = grid.DetectLimiters(selectedGap).FindAll(obj => obj != gameObject);
+
+            // Calculate gap speed
+            Debug.Log("Calculate gap speed for limiter count: " + limiterList.Count);
+            Vector3 gapSpeed = new Vector3(0, 0, 0);
+            if (limiterList.Count > 0)
+            {
+                foreach(GameObject obj in limiterList)
+                {
+                    gapSpeed += obj.GetComponent<NavMeshAgent>().velocity;
+                }
+                gapSpeed = gapSpeed / limiterList.Count;
+            }
+            Debug.Log("Gap speed: " + gapSpeed);
         }
     }
 
@@ -137,7 +155,6 @@ public class AgentControl : MonoBehaviour
                     minAngle = angle;
                 }
             }
-            grid.DetectLimiters(selectedGap).Where(obj => obj != gameObject).ToList();
             return selectedGap;
         }
 
