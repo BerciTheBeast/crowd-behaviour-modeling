@@ -82,7 +82,10 @@ public class AgentControl : MonoBehaviour
 
             if (selectedGap != null)
             {
-                DrawGap(selectedGap);
+                Gap fullGap = grid.getSearchArea(agent.gameObject.transform.position, gapSearchArea);
+                DrawGap(fullGap, Color.blue, 0.5f);
+
+                DrawGap(selectedGap, Color.green);
                 GapSeeking(selectedGap);
             }
         } else if (ShouldEndSeeking())
@@ -237,14 +240,14 @@ public class AgentControl : MonoBehaviour
         return Mathf.Clamp(probability, 0, 1);
     }
 
-     public void DrawGap(Gap gap)
+     public void DrawGap(Gap gap, Color color, float duration = 2.5f)
     {
         Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
         Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
 
-        Debug.DrawLine(new Vector3(p1.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p1.z), Color.green, 2.5f);
-        Debug.DrawLine(new Vector3(p2.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), Color.green, 2.5f);
-        Debug.DrawLine(new Vector3(p2.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p2.z), Color.green, 2.5f);
-        Debug.DrawLine(new Vector3(p1.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p1.z), Color.green, 2.5f);
+        Debug.DrawLine(new Vector3(p1.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p1.z), color, duration);
+        Debug.DrawLine(new Vector3(p2.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), color, duration);
+        Debug.DrawLine(new Vector3(p2.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p2.z), color, duration);
+        Debug.DrawLine(new Vector3(p1.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p1.z), color, duration);
     }
 }

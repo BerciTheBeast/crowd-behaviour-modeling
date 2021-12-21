@@ -12,7 +12,7 @@ public class Grid
     private int[,] gridArray;
     private TextMesh[,] debugTextArray;
 
-    public Grid(int width, int height, float cellSize, Vector3 originPosition)
+    public Grid(int width, int height, float cellSize, Vector3 originPosition, bool isVisible = false)
     {
         this.width = width;
         this.height = height;
@@ -21,6 +21,20 @@ public class Grid
 
         gridArray = new int[width, height];
         debugTextArray = new TextMesh[width, height];
+
+        if (isVisible)
+        {
+            for (int x = 0; x < gridArray.GetLength(0); x++)
+            {
+                for (int y = 0; y < gridArray.GetLength(1); y++)
+                {
+                    Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 600f);
+                    Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 600f);
+                }
+            }
+            Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, 600f);
+            Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, 600f);
+        }
 
     }
 
@@ -93,15 +107,25 @@ public class Grid
         return hitColliders;
     }
 
+    public Gap getSearchArea(Vector3 pos, int searchDist)
+    {
+        int x, y;
+        GetXY(pos, out x, out y);
+        return new Gap(
+            new Vector2(Mathf.Max(0, x - searchDist), Mathf.Min(height, y + searchDist)),
+            new Vector2(Mathf.Min(width, x + searchDist), Mathf.Max(0, y - searchDist))
+        );
+    }
+
     public List<Gap> GapDetection(Vector3 pos, int searchDist, int seeds)
     {        
         int x, y;
         GetXY(pos, out x, out y);
 
         List<Vector2> explorationArea = new List<Vector2>();
-        for (int i = Mathf.Max(0, x - searchDist); i < Mathf.Min(width, x + searchDist); i ++)
+        for (int i = Mathf.Max(0, x - searchDist); i <= Mathf.Min(width - 1, x + searchDist); i ++)
         {
-            for (int j = Mathf.Max(0, y - searchDist); j < Mathf.Min(height, y + searchDist); j++)
+            for (int j = Mathf.Max(0, y - searchDist); j <= Mathf.Min(height - 1, y + searchDist); j++)
             {
                 if (GetValue(i, j) == 0) explorationArea.Add(new Vector2(i, j));
             }
