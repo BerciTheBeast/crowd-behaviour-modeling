@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,6 +47,8 @@ public class AgentControl : MonoBehaviour
     public float beta = 0.75f;
     [Min(1f)]
     public float lambda = 2.3f;
+    [Min(0.000001f)]
+    public float tau = 0.65f;
 
     void Start()
     {
@@ -112,6 +115,7 @@ public class AgentControl : MonoBehaviour
         }
     }
 
+    // Gap selection
     public Gap GapSelection(List<Gap> gaps)
     {
         Vector3 agentPos = agent.gameObject.transform.position;
@@ -258,7 +262,66 @@ public class AgentControl : MonoBehaviour
         return Mathf.Clamp(probability, 0, 1);
     }
 
-     public void DrawGap(Gap gap, Color color, float duration = 2.5f)
+    // Following
+    public List<GameObject> FolloweeDetection() // TODO: test if this works
+    {
+        // get agent direction and find agents in front
+        HashSet<GameObject> candidates = new HashSet<GameObject>();
+        Vector3 agentDirection = agent.gameObject.transform.forward;
+        Vector3 detectionCenter = agent.gameObject.transform.position + agentDirection * (visionRadius / 2);
+        detectionCenter.y = 0.1f;
+        Collider[] hitColliders = Physics.OverlapBox(detectionCenter, new Vector3((visionRadius - 0.5f) / 2, 0, (visionRadius - 0.5f) / 2), Quaternion.identity);
+
+        // extract game objects and add to set
+        foreach (Collider col in hitColliders)
+        {
+            candidates.Add(col.gameObject);
+        }
+
+        // filter seekers & followers
+        List<GameObject> candidateList = candidates.Where(obj => obj.name.Contains("Capsule")).Where(obj => {
+            if (obj.TryGetComponent(typeof(AgentControl), out Component component))
+            {
+                if (((AgentControl) component).behaviour == AgentBehaviourType.GapSeeking || ((AgentControl) component).behaviour == AgentBehaviourType.Following)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }).ToList();
+        return candidateList;
+    }
+
+    public void FolloweeSelection(List<GameObject> followeeCandidates)
+    {
+        // TODO
+        // check angle
+        // check if already followed
+        // probability selection
+    }
+
+    public float GetFollowerSpeed()
+    {
+        // TODO
+        return 0;
+    }
+
+    public Vector3 GetFollowerDirection()
+    {
+        // TODO
+        // We'll probably just set and update navmesh agent destionation to do this for us.
+        return new Vector3();
+    }
+
+    public float GetFollowingDuration()
+    {
+        // TODO
+        // time = followee time - diff detween follower behaviour start & this behaviour start
+        return 0;
+    }
+
+
+    public void DrawGap(Gap gap, Color color, float duration = 2.5f)
     {
         Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
         Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
