@@ -30,10 +30,14 @@ public class AgentControl : MonoBehaviour
     public float visionRadius = 2.5f;
     public float visionAngle = 120.0f;
     [Min(0f)]
-    public float stoppingDistance = 0.5f;
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
     private float seekingEnd;
+
+    // Stop & Go behaviour variables.
+    public float stoppingDistance = 0.5f;
+    public float stopTimeThreshold = 3.0f;
+    public float stopTime;
 
     // bounding coefficients
     [Range(0.000001f, 1f)]
@@ -62,6 +66,7 @@ public class AgentControl : MonoBehaviour
     void Update() {
         CheckDestinationReached();
         GapSeekingBehaviour();
+        StopAndGoBehaviour();
     }
 
     void CheckDestinationReached()
@@ -72,6 +77,19 @@ public class AgentControl : MonoBehaviour
         }
     }
 
+    void StopAndGoBehaviour()
+    {
+        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 100) == 1) // TODO: Probability.
+        {
+            behaviour = AgentBehaviourType.StopAndGo;
+            agent.isStopped = true;
+            stopTime = Time.time + stopTimeThreshold;
+        } else if (behaviour == AgentBehaviourType.StopAndGo && stopTime < Time.time)
+        {
+            agent.isStopped = false;
+            behaviour = AgentBehaviourType.Default;
+        }
+    }
 
     void GapSeekingBehaviour()
     {
@@ -88,7 +106,7 @@ public class AgentControl : MonoBehaviour
                 DrawGap(selectedGap, Color.green);
                 GapSeeking(selectedGap);
             }
-        } else if (ShouldEndSeeking())
+        } else if (behaviour == AgentBehaviourType.GapSeeking && ShouldEndSeeking())
         {
             EndSeeking();
         }
