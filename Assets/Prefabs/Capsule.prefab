@@ -130,7 +130,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_Children: []
+  m_Children:
+  - {fileID: 1783896690}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -231,19 +232,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed6185f285e4d2f4e939613de8e6d2bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
+  startingPosition: {x: 0, y: 0, z: 0}
   destination: {x: 0, y: 0, z: 0}
   origin: {fileID: 0}
   respawn: 1
   seeds: 5
-  gapSearchArea: 3
-  visionRadius: 2
+  gapSearchArea: 15
+  visionRadius: 7.5
   visionAngle: 120
+  deviationAngle: 166
   stoppingDistance: 0.5
   destinationTresholdAngle: 78
   behaviour: 0
+  isGapSeeker: 0
+  isFollower: 0
+  followedBy: {fileID: 0}
+  followingTarget: {fileID: 0}
+  followingStart: 0
+  followingDuration: 0
   alpha: 0.5
   beta: 0.75
+  lambda: 2.3
+  tau: 0.65
 --- !u!120 &2518359526414878470
 LineRenderer:
   m_ObjectHideFlags: 0

@@ -24,13 +24,16 @@ public class SpawnPoint : MonoBehaviour
     [Min(0f)]
     public float spawnCooldown = 1.0f;
 
+    int count = 0;
+    private GridComponent grid;
+
 
     // Start is called before the first frame update.
     void Start()
     {
         VerticeList = new List<Vector3>(GetComponent<MeshFilter>().sharedMesh.vertices); //get vertice points from the mesh of the object
         CalculateCornerPoints();
-
+        grid = GameObject.Find("/Map/Plane").GetComponent<GridComponent>();
         destination = (SpawnPoint) destinationSpawnPoint.GetComponent<SpawnPoint>();
         if (spawnable)
         {
@@ -101,6 +104,17 @@ public class SpawnPoint : MonoBehaviour
         GameObject capsule = (GameObject)Instantiate(entity, CalculateRandomPoint(), Quaternion.identity);
         capsule.GetComponent<AgentControl>().destination = destination.CalculateRandomPoint();
         capsule.GetComponent<AgentControl>().origin = this;
+        if (count < 1)
+        {
+            count++;
+            capsule.GetComponent<AgentControl>().isGapSeeker = true;
+            grid.AddGapSeeker(capsule);
+        } else if (count < 4)
+        {
+            count++;
+            capsule.GetComponent<AgentControl>().isFollower = true;
+            grid.AddFollower(capsule);
+        }
     }
 
     public void Respawn(GameObject capsule)

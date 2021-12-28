@@ -9,6 +9,9 @@ public class GridComponent : MonoBehaviour
     private Vector3 origin;
     public bool isVisible = false;
 
+    HashSet<GameObject> gapSeekers = new HashSet<GameObject>();
+    HashSet<GameObject> followers = new HashSet<GameObject>();
+
     [Min(0.1f)]
     public float cellSize = 10f;
 
@@ -23,5 +26,23 @@ public class GridComponent : MonoBehaviour
     void FixedUpdate()
     {
         grid.UpdateOccupancy();
+    }
+
+    public void AddGapSeeker(GameObject seeker)
+    {
+        gapSeekers.Add(seeker);
+    }
+    public void RemoveGapSeeker(GameObject seeker)
+    {
+        gapSeekers.Remove(seeker);
+    }
+
+    public void AddFollower(GameObject follower)
+    {
+        gapSeekers.Add(follower);
+    }
+    public void RemoveFollower(GameObject follower)
+    {
+        gapSeekers.Remove(follower);
     }
 }

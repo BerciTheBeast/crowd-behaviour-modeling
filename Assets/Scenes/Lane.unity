@@ -617,7 +617,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
@@ -625,7 +625,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
-      value: 1
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -831,7 +831,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
-      value: 1
+      value: 0.51
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -893,15 +893,3 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1527476820510052618, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
   m_PrefabInstance: {fileID: 1574642554}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2111132095
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2111132089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97996103d908248008a1e3a3a3402f97, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

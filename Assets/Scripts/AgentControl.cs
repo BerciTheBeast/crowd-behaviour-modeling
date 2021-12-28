@@ -30,11 +30,21 @@ public class AgentControl : MonoBehaviour
     [Min(1.0f)]
     public float visionRadius = 2.5f;
     public float visionAngle = 120.0f;
+    public float deviationAngle = 166.0f;
     [Min(0f)]
     public float stoppingDistance = 0.5f;
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
-    private float seekingEnd;
+    public bool isGapSeeker = false;
+    public bool isFollower = false;
+
+    private float seekingStart;
+    private float seekingDuration;
+
+    public GameObject followedBy = null;
+    public GameObject followingTarget = null;
+    public float followingStart;
+    public float followingDuration;
 
     // bounding coefficients
     [Range(0.000001f, 1f)]
@@ -65,6 +75,7 @@ public class AgentControl : MonoBehaviour
     void Update() {
         CheckDestinationReached();
         GapSeekingBehaviour();
+        FollowingBehaviour();
     }
 
     void CheckDestinationReached()
@@ -78,7 +89,7 @@ public class AgentControl : MonoBehaviour
 
     void GapSeekingBehaviour()
     {
-        if (behaviour == AgentBehaviourType.Default && Random.value < GetGapSeekingProbability())
+        if (isGapSeeker && behaviour == AgentBehaviourType.Default && Random.value < GetGapSeekingProbability())
         {
             List<Gap> gaps = grid.GapDetection(agent.gameObject.transform.position, gapSearchArea, seeds);
             Gap selectedGap = GapSelection(gaps);
@@ -198,7 +209,8 @@ public class AgentControl : MonoBehaviour
         Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
 
         // Set new agent destination
-        seekingEnd = Time.time + seekingTime;
+        seekingStart = Time.time;
+        seekingDuration = seekingTime;
         agent.SetDestination(gapDestination);
     }
 
@@ -219,7 +231,7 @@ public class AgentControl : MonoBehaviour
 
     private bool ShouldEndSeeking()
     {
-        if (seekingEnd < Time.time || agent.remainingDistance <= agent.stoppingDistance)
+        if (behaviour == AgentBehaviourType.GapSeeking && ((seekingStart + seekingDuration) < Time.time || agent.remainingDistance <= agent.stoppingDistance))
         {
             return true;
         }
@@ -245,6 +257,30 @@ public class AgentControl : MonoBehaviour
     }
 
     // Following
+    public void FollowingBehaviour()
+    {
+        if (isFollower && behaviour == AgentBehaviourType.Default)
+        {
+            List<GameObject> candidates = FolloweeDetection();
+            GameObject selectedFollowee = FolloweeSelection(candidates);
+
+            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
+            if (selectedFollowee != null)
+            {
+                Debug.Log("Starting following");
+                Following(selectedFollowee);
+            }
+        }
+        else if (ShouldEndFollowing())
+        {
+            EndFollowing();
+        }
+        else if (behaviour == AgentBehaviourType.Following)
+        {
+            UpdateFollowingDestionation();
+        }
+
+    }
     public List<GameObject> FolloweeDetection() // TODO: test if this works
     {
         // get agent direction and find agents in front
@@ -262,6 +298,10 @@ public class AgentControl : MonoBehaviour
 
         // filter seekers & followers
         List<GameObject> candidateList = candidates.Where(obj => obj.name.Contains("Capsule")).Where(obj => {
+            if (obj == gameObject)
+            {
+                return false;
+            }
             if (obj.TryGetComponent(typeof(AgentControl), out Component component))
             {
                 if (((AgentControl) component).behaviour == AgentBehaviourType.GapSeeking || ((AgentControl) component).behaviour == AgentBehaviourType.Following)
@@ -271,35 +311,141 @@ public class AgentControl : MonoBehaviour
             }
             return false;
         }).ToList();
+        Debug.Log("Followee candidates detected: " + candidateList.Count);
         return candidateList;
     }
 
-    public void FolloweeSelection(List<GameObject> followeeCandidates)
+    public GameObject FolloweeSelection(List<GameObject> followeeCandidates)
     {
-        // TODO
         // check angle
+        IEnumerable<GameObject> followeeCandidatesF = followeeCandidates.Where(obj =>
+        {
+            return Vector3.Angle(agent.gameObject.transform.forward, obj.transform.forward) <= (deviationAngle / 2);
+        });
+        Debug.Log("Followee candidates after angle: " + followeeCandidatesF.ToList().Count);
         // check if already followed
+        followeeCandidatesF = followeeCandidates.Where(obj =>
+        {
+            if (obj.TryGetComponent(typeof(AgentControl), out Component component))
+            {
+                if (((AgentControl)component).behaviour == AgentBehaviourType.GapSeeking || ((AgentControl)component).behaviour == AgentBehaviourType.Following)
+                {
+                    if (((AgentControl)component).followedBy == null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+        Debug.Log("Followee candidates after already followed: " + followeeCandidatesF.ToList().Count);
         // probability selection
+        List<GameObject> filteredList = followeeCandidatesF.ToList();
+        if (filteredList.Count == 0)
+        {
+            return null;
+        } else
+        {
+            float probSum = 0;
+            List<float> probs = new List<float>();
+            foreach (GameObject obj in filteredList)
+            {
+                float dist = Vector3.Distance(gameObject.transform.position, obj.transform.position);
+                float prob = Mathf.Exp(-tau * dist);
+                probs.Add(prob);
+                probSum += prob;
+            }
+            if (probSum == 0)
+            {
+                return null;
+            }
+
+            List<float> reProbs = new List<float>();
+            foreach(float val in probs)
+            {
+                reProbs.Add(val / probSum);
+            }
+
+            float selectionProbability = Random.value;
+            float accumulatedSum = 0;
+            for (int i = 0; i < filteredList.Count; i++)
+            {
+                accumulatedSum += reProbs[i];
+                if (selectionProbability < accumulatedSum)
+                {
+                    return filteredList[i];
+                }
+            }
+            return null;
+        }
     }
 
-    public float GetFollowerSpeed()
+    public void Following(GameObject target)
+    {   
+        if (target == null)
+        {
+            return;
+        }
+        float duration = GetFollowingDuration(target);
+        Debug.Log("Following duration: " + duration);
+        if (duration > 0)
+        {
+            if (target.TryGetComponent(typeof(AgentControl), out Component component))
+            {
+                // do stuff
+                followingStart = Time.time;
+                followingDuration = duration;
+                followingTarget = target;
+                ((AgentControl)component).followedBy = gameObject;
+                behaviour = AgentBehaviourType.Following;
+                agent.SetDestination(target.transform.position);
+            }
+        }
+    }
+
+    public float GetFollowingDuration(GameObject target)
     {
-        // TODO
+        if (target.TryGetComponent(typeof(AgentControl), out Component component))
+        {
+            float differenceOffset = 0;
+            if (((AgentControl)component).behaviour == AgentBehaviourType.GapSeeking)
+            {
+                return ((AgentControl)component).seekingDuration;
+            }
+            else if (((AgentControl)component).behaviour == AgentBehaviourType.Following)
+            {
+                return ((AgentControl)component).followingDuration - (Time.time - ((AgentControl)component).followingStart);
+            }
+        }
         return 0;
     }
 
-    public Vector3 GetFollowerDirection()
+    public bool ShouldEndFollowing()
     {
-        // TODO
-        // We'll probably just set and update navmesh agent destionation to do this for us.
-        return new Vector3();
+        if (behaviour == AgentBehaviourType.Following && (followingStart + followingDuration) < Time.time)
+        {
+            return true;
+        }
+        return false;
     }
 
-    public float GetFollowingDuration()
+    public void EndFollowing()
     {
-        // TODO
-        // time = followee time - diff detween follower behaviour start & this behaviour start
-        return 0;
+        if (followingTarget != null && followingTarget.TryGetComponent(typeof(AgentControl), out Component component))
+        {
+            agent.SetDestination(destination);
+            behaviour = AgentBehaviourType.Default;
+            followingTarget = null;
+            ((AgentControl) component).followedBy = null;
+        }
+    }
+
+    public void UpdateFollowingDestionation()
+    {
+        if (Vector3.Distance(agent.destination, followingTarget.transform.position) > 0.1f)
+        {
+            agent.SetDestination(followingTarget.transform.position);
+        }
     }
 
 
