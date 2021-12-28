@@ -428,7 +428,7 @@ public class AgentControl : MonoBehaviour
             float differenceOffset = 0;
             if (((AgentControl)component).behaviour == AgentBehaviourType.GapSeeking)
             {
-                return ((AgentControl)component).seekingDuration;
+                return ((AgentControl)component).seekingDuration - (Time.time - ((AgentControl)component).seekingStart);
             }
             else if (((AgentControl)component).behaviour == AgentBehaviourType.Following)
             {
