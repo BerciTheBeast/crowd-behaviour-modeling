@@ -237,7 +237,7 @@ MonoBehaviour:
   origin: {fileID: 0}
   respawn: 1
   seeds: 5
-  gapSearchArea: 5
+  gapSearchArea: 3
   visionRadius: 2
   visionAngle: 120
   deviationAngle: 83
