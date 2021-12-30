@@ -237,11 +237,10 @@ MonoBehaviour:
   origin: {fileID: 0}
   respawn: 1
   seeds: 5
-  gapSearchArea: 15
-  visionRadius: 7.5
+  gapSearchArea: 5
+  visionRadius: 2
   visionAngle: 120
-  deviationAngle: 166
-  stoppingDistance: 0.5
+  deviationAngle: 83
   destinationTresholdAngle: 78
   behaviour: 0
   isGapSeeker: 0
@@ -250,6 +249,9 @@ MonoBehaviour:
   followingTarget: {fileID: 0}
   followingStart: 0
   followingDuration: 0
+  stoppingDistance: 0.5
+  stopTimeThreshold: 3
+  stopTime: 0
   alpha: 0.5
   beta: 0.75
   lambda: 2.3
