@@ -33,7 +33,7 @@ public class AgentControl : MonoBehaviour
     [Min(1)]
     public int seeds = 3;
     [Min(1)]
-    public int gapSearchArea = 5;
+    public int gapSearchArea = 15;
     [Min(1.0f)]
     public float visionRadius = 2.5f;
     public float visionAngle = 120.0f;
@@ -97,6 +97,19 @@ public class AgentControl : MonoBehaviour
         if (behaviour == AgentBehaviourType.Default && respawn && agent.remainingDistance <= agent.stoppingDistance)
         {
             this.origin.Respawn(agent.gameObject);
+        }
+    }
+
+    void OvertakingBehaviour() {
+        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 1000) == 1) // TODO: Probability.
+        {
+            behaviour = AgentBehaviourType.Overtaking;
+            // agent.isStopped = true;
+            // stopTime = Time.time + stopTimeThreshold;
+        } else if (behaviour == AgentBehaviourType.Overtaking) // TODO: Add stopping condition
+        {
+            // agent.isStopped = false;
+            behaviour = AgentBehaviourType.Default;
         }
     }
 
