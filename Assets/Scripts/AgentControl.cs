@@ -36,8 +36,8 @@ public class AgentControl : MonoBehaviour
     public int gapSearchArea = 15;
     [Min(1.0f)]
     public float visionRadius = 2.5f;
-    public float visionAngle = 120.0f;
-    public float deviationAngle = 166.0f;
+    public float visionAngle = 60.0f;
+    public float deviationAngle = 83.0f;
     [Min(0f)]
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
@@ -94,7 +94,7 @@ public class AgentControl : MonoBehaviour
 
     void CheckDestinationReached()
     {
-        if (behaviour == AgentBehaviourType.Default && respawn && agent.remainingDistance <= agent.stoppingDistance)
+        if (respawn && Vector3.Distance(agent.gameObject.transform.position, destination)  <= 1.0f)
         {
             this.origin.Respawn(agent.gameObject);
         }
@@ -193,7 +193,7 @@ public class AgentControl : MonoBehaviour
             gap.agentToCenter = gapCenter - agentPos;
             gap.agentToCenter.y = 0;
 
-            if (gap.agentToCenter.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, gap.agentToCenter) > (visionAngle / 2))
+            if (gap.agentToCenter.magnitude > visionRadius || Vector3.Angle(agent.gameObject.transform.forward, gap.agentToCenter) > visionAngle)
             {
                 gaps.RemoveAt(i);
             }
@@ -383,7 +383,7 @@ public class AgentControl : MonoBehaviour
         Vector3 followerDirection = destination - agent.gameObject.transform.position;
         IEnumerable<GameObject> followeeCandidatesF = followeeCandidates.Where(obj =>
         {
-            return Vector3.Angle(followerDirection, obj.transform.forward) <= (deviationAngle / 2);
+            return Vector3.Angle(followerDirection, obj.transform.forward) <= deviationAngle;
         });
 
         // Check if already followed.
