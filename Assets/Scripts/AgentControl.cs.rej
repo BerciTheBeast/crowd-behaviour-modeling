@@ -1,0 +1,42 @@
+diff a/Assets/Scripts/AgentControl.cs b/Assets/Scripts/AgentControl.cs	(rejected hunks)
+@@ -133,40 +133,11 @@
+ 
+                 DrawGap(selectedGap, Color.green);
+                 GapSeeking(selectedGap);
+-                UpdateAgentMaterial();
+             }
+         } else if (ShouldEndSeeking())
+         {
+             EndSeeking();
+-            UpdateAgentMaterial();
+-        }
+-    }
+-
+-    public void FollowingBehaviour()
+-    {
+-        if (isFollower && behaviour == AgentBehaviourType.Default)
+-        {
+-            List<GameObject> candidates = FolloweeDetection();
+-            GameObject selectedFollowee = FolloweeSelection(candidates);
+-
+-            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
+-            if (selectedFollowee != null)
+-            {
+-                Debug.Log("Starting following");
+-                Following(selectedFollowee);
+-                UpdateAgentMaterial();
+-            }
+         }
+-        else if (ShouldEndFollowing())
+-        {
+-            EndFollowing();
+-            UpdateAgentMaterial();
+-        }
+-        else if (behaviour == AgentBehaviourType.Following)
+-        {
+-            UpdateFollowingDestination();
+-        }
+-
+     }
+ 
+     // Gap selection
