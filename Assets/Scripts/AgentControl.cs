@@ -10,11 +10,17 @@ public enum AgentBehaviourType
     GapSeeking,
     Following,
     StopAndGo,
-    Overtagking
+    Overtaking
 }
 
 public class AgentControl : MonoBehaviour
 {
+    public Material gapSeakingMaterial;
+    public Material followingMaterial;
+    public Material stopAndGoMaterial;
+    public Material overtakingMaterial;
+    public Material defaultMaterial;
+
     private GridComponent gridComponent;
     private Grid grid;
     private NavMeshAgent agent;
@@ -96,15 +102,17 @@ public class AgentControl : MonoBehaviour
 
     void StopAndGoBehaviour()
     {
-        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 100) == 1) // TODO: Probability.
+        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 1000) == 1) // TODO: Probability.
         {
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
             stopTime = Time.time + stopTimeThreshold;
+            UpdateAgentMaterial();
         } else if (behaviour == AgentBehaviourType.StopAndGo && stopTime < Time.time)
         {
             agent.isStopped = false;
             behaviour = AgentBehaviourType.Default;
+            UpdateAgentMaterial();
         }
     }
 
@@ -122,11 +130,40 @@ public class AgentControl : MonoBehaviour
 
                 DrawGap(selectedGap, Color.green);
                 GapSeeking(selectedGap);
+                UpdateAgentMaterial();
             }
         } else if (ShouldEndSeeking())
         {
             EndSeeking();
+            UpdateAgentMaterial();
         }
+    }
+
+    public void FollowingBehaviour()
+    {
+        if (isFollower && behaviour == AgentBehaviourType.Default)
+        {
+            List<GameObject> candidates = FolloweeDetection();
+            GameObject selectedFollowee = FolloweeSelection(candidates);
+
+            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
+            if (selectedFollowee != null)
+            {
+                Debug.Log("Starting following");
+                Following(selectedFollowee);
+                UpdateAgentMaterial();
+            }
+        }
+        else if (ShouldEndFollowing())
+        {
+            EndFollowing();
+            UpdateAgentMaterial();
+        }
+        else if (behaviour == AgentBehaviourType.Following)
+        {
+            UpdateFollowingDestination();
+        }
+
     }
 
     // Gap selection
@@ -277,31 +314,6 @@ public class AgentControl : MonoBehaviour
         return Mathf.Clamp(probability, 0, 1);
     }
 
-    // Following
-    public void FollowingBehaviour()
-    {
-        if (isFollower && behaviour == AgentBehaviourType.Default)
-        {
-            List<GameObject> candidates = FolloweeDetection();
-            GameObject selectedFollowee = FolloweeSelection(candidates);
-
-            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
-            if (selectedFollowee != null)
-            {
-                Debug.Log("Starting following");
-                Following(selectedFollowee);
-            }
-        }
-        else if (ShouldEndFollowing())
-        {
-            EndFollowing();
-        }
-        else if (behaviour == AgentBehaviourType.Following)
-        {
-            UpdateFollowingDestionation();
-        }
-
-    }
     public List<GameObject> FolloweeDetection() // TODO: test if this works
     {
         // get agent direction and find agents in front
@@ -338,13 +350,14 @@ public class AgentControl : MonoBehaviour
 
     public GameObject FolloweeSelection(List<GameObject> followeeCandidates)
     {
-        // check angle
+        // Check angle.
         IEnumerable<GameObject> followeeCandidatesF = followeeCandidates.Where(obj =>
         {
             return Vector3.Angle(agent.gameObject.transform.forward, obj.transform.forward) <= (deviationAngle / 2);
         });
         Debug.Log("Followee candidates after angle: " + followeeCandidatesF.ToList().Count);
-        // check if already followed
+
+        // Check if already followed.
         followeeCandidatesF = followeeCandidates.Where(obj =>
         {
             if (obj.TryGetComponent(typeof(AgentControl), out Component component))
@@ -359,8 +372,9 @@ public class AgentControl : MonoBehaviour
             }
             return false;
         });
+
         Debug.Log("Followee candidates after already followed: " + followeeCandidatesF.ToList().Count);
-        // probability selection
+        // Probability selection.
         List<GameObject> filteredList = followeeCandidatesF.ToList();
         if (filteredList.Count == 0)
         {
@@ -413,7 +427,6 @@ public class AgentControl : MonoBehaviour
         {
             if (target.TryGetComponent(typeof(AgentControl), out Component component))
             {
-                // do stuff
                 followingStart = Time.time;
                 followingDuration = duration;
                 followingTarget = target;
@@ -461,7 +474,7 @@ public class AgentControl : MonoBehaviour
         }
     }
 
-    public void UpdateFollowingDestionation()
+    public void UpdateFollowingDestination()
     {
         if (Vector3.Distance(agent.destination, followingTarget.transform.position) > 0.1f)
         {
@@ -479,5 +492,31 @@ public class AgentControl : MonoBehaviour
         Debug.DrawLine(new Vector3(p2.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), color, duration);
         Debug.DrawLine(new Vector3(p2.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p2.z), color, duration);
         Debug.DrawLine(new Vector3(p1.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p1.z), color, duration);
+    }
+
+    public void UpdateAgentMaterial()
+    {
+        switch (behaviour)
+        {
+            case AgentBehaviourType.GapSeeking:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = gapSeakingMaterial;
+                break;
+
+            case AgentBehaviourType.Following:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = followingMaterial;
+                break;
+
+            case AgentBehaviourType.StopAndGo:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = stopAndGoMaterial;
+                break;
+
+            case AgentBehaviourType.Overtaking:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = overtakingMaterial;
+                break;
+
+            default:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = defaultMaterial;
+                break;
+        }
     }
 }
