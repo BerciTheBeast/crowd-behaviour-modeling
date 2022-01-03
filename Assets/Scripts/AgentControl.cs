@@ -21,7 +21,8 @@ public class AgentControl : MonoBehaviour
     public Vector3 startingPosition;
     public Vector3 destination;
     public SpawnPoint origin;
-    
+    private Animator animator;
+
     public bool respawn = true;
     [Min(1)]
     public int seeds = 3;
@@ -64,6 +65,7 @@ public class AgentControl : MonoBehaviour
     {
         agent = this.GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
+        animator = this.GetComponentInChildren<Animator>();
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         grid = gridComponent.grid;
         startingPosition = agent.gameObject.transform.position;
@@ -77,6 +79,7 @@ public class AgentControl : MonoBehaviour
 
 
     void Update() {
+        animator.SetFloat("velocity", agent.velocity.magnitude);
         CheckDestinationReached();
         GapSeekingBehaviour();
         FollowingBehaviour();
