@@ -10,7 +10,7 @@ public enum AgentBehaviourType
     GapSeeking,
     Following,
     StopAndGo,
-    Overtagking
+    Overtaking
 }
 
 public class AgentControl : MonoBehaviour
@@ -93,7 +93,7 @@ public class AgentControl : MonoBehaviour
 
     void StopAndGoBehaviour()
     {
-        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 100) == 1) // TODO: Probability.
+        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 1000) == 1) // TODO: Probability.
         {
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
