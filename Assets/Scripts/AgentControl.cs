@@ -159,10 +159,8 @@ public class AgentControl : MonoBehaviour
             List<GameObject> candidates = FolloweeDetection();
             GameObject selectedFollowee = FolloweeSelection(candidates);
 
-            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
             if (selectedFollowee != null)
             {
-                Debug.Log("Starting following");
                 Following(selectedFollowee);
                 UpdateAgentMaterial();
             }
@@ -276,13 +274,10 @@ public class AgentControl : MonoBehaviour
     public void GapSeeking(Gap gap)
     {
         behaviour = AgentBehaviourType.GapSeeking;
-        // Perform gap seeking.
         // Get limiter objects
-        Debug.Log("Get limiter objects");
         List<GameObject> limiterList = grid.DetectLimiters(gap).FindAll(obj => obj != gameObject);
 
         // Calculate gap speed.
-        Debug.Log("Calculate gap speed for limiter count: " + limiterList.Count);
         Vector3 gapSpeed = new Vector3(0, 0, 0);
         if (limiterList.Count > 0)
         {
@@ -292,7 +287,6 @@ public class AgentControl : MonoBehaviour
             }
             gapSpeed = gapSpeed / limiterList.Count;
         }
-        Debug.Log("Gap speed: " + gapSpeed);
 
         // Determine seeking time.
         float gapSeekerSpeed = GetGapSeekerSpeed(GetGapArea(gap));
@@ -346,27 +340,25 @@ public class AgentControl : MonoBehaviour
         Vector3 startToAgent = agent.gameObject.transform.position - startingPosition;
         startToAgent.y = 0;
         float probability = lambda * agentToDestination.magnitude / startToAgent.magnitude;
-        // Debug.Log("Dist to start, end, ratio (end/start): " + startToAgent.magnitude + ", " + agentToDestination.magnitude + ", " + agentToDestination.magnitude / startToAgent.magnitude);
-        // Debug.Log("Gap seeking probability: " + Mathf.Clamp(probability, 0, 1));
         return Mathf.Clamp(probability, 0, 1);
     }
 
     public List<GameObject> FolloweeDetection()
     {
-        // get agent direction and find agents in front
+        // Get agent direction and find agents in front.
         HashSet<GameObject> candidates = new HashSet<GameObject>();
         Vector3 agentDirection = agent.gameObject.transform.forward;
         Vector3 detectionCenter = agent.gameObject.transform.position + agentDirection * (visionRadius / 2);
         detectionCenter.y = 0.1f;
         Collider[] hitColliders = Physics.OverlapBox(detectionCenter, new Vector3((visionRadius - 0.5f) / 2, 0, (visionRadius - 0.5f) / 2), Quaternion.identity);
 
-        // extract game objects and add to set
+        // Extract game objects and add to set.
         foreach (Collider col in hitColliders)
         {
             candidates.Add(col.gameObject);
         }
 
-        // filter seekers & followers
+        // Filter seekers & followers.
         List<GameObject> candidateList = candidates.Where(obj => obj.name.Contains("Capsule")).Where(obj => {
             if (obj == gameObject)
             {
@@ -381,7 +373,7 @@ public class AgentControl : MonoBehaviour
             }
             return false;
         }).ToList();
-        Debug.Log("Followee candidates detected: " + candidateList.Count);
+
         return candidateList;
     }
 
@@ -393,7 +385,6 @@ public class AgentControl : MonoBehaviour
         {
             return Vector3.Angle(followerDirection, obj.transform.forward) <= (deviationAngle / 2);
         });
-        Debug.Log("Followee candidates after angle: " + followeeCandidatesF.ToList().Count);
 
         // Check if already followed.
         followeeCandidatesF = followeeCandidates.Where(obj =>
@@ -411,7 +402,6 @@ public class AgentControl : MonoBehaviour
             return false;
         });
 
-        Debug.Log("Followee candidates after already followed: " + followeeCandidatesF.ToList().Count);
         // Probability selection.
         List<GameObject> filteredList = followeeCandidatesF.ToList();
         if (filteredList.Count == 0)
@@ -460,7 +450,7 @@ public class AgentControl : MonoBehaviour
             return;
         }
         float duration = GetFollowingDuration(target);
-        Debug.Log("Following duration: " + duration);
+
         if (duration > 0)
         {
             if (target.TryGetComponent(typeof(AgentControl), out Component component))
