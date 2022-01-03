@@ -233,6 +233,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed6185f285e4d2f4e939613de8e6d2bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gapSeakingMaterial: {fileID: 2100000, guid: 4278d6f46024b419e9f5165426718969, type: 2}
+  followingMaterial: {fileID: 2100000, guid: a59ad90817304435ab8c00f71edf98d9, type: 2}
+  stopAndGoMaterial: {fileID: 2100000, guid: fa7ebe3f7e2d14a58b7025fb756e3f8f, type: 2}
+  overtakingMaterial: {fileID: 2100000, guid: 5f3b6692fe2704c488f2e7d77bad7adf, type: 2}
+  defaultMaterial: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   startingPosition: {x: 0, y: 0, z: 0}
   destination: {x: 0, y: 0, z: 0}
   origin: {fileID: 0}
