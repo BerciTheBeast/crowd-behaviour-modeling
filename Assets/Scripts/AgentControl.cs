@@ -338,10 +338,11 @@ public class AgentControl : MonoBehaviour
 
     public GameObject FolloweeSelection(List<GameObject> followeeCandidates)
     {
+        Vector3 followerDirection = destination - agent.gameObject.transform.position;
         // check angle
         IEnumerable<GameObject> followeeCandidatesF = followeeCandidates.Where(obj =>
         {
-            return Vector3.Angle(agent.gameObject.transform.forward, obj.transform.forward) <= (deviationAngle / 2);
+            return Vector3.Angle(followerDirection, obj.transform.forward) <= (deviationAngle / 2);
         });
         Debug.Log("Followee candidates after angle: " + followeeCandidatesF.ToList().Count);
         // check if already followed
