@@ -15,13 +15,20 @@ public enum AgentBehaviourType
 
 public class AgentControl : MonoBehaviour
 {
+    public Material gapSeakingMaterial;
+    public Material followingMaterial;
+    public Material stopAndGoMaterial;
+    public Material overtakingMaterial;
+    public Material defaultMaterial;
+
     private GridComponent gridComponent;
     private Grid grid;
     private NavMeshAgent agent;
     public Vector3 startingPosition;
     public Vector3 destination;
     public SpawnPoint origin;
-    
+    private Animator animator;
+
     public bool respawn = true;
     [Min(1)]
     public int seeds = 3;
@@ -47,8 +54,8 @@ public class AgentControl : MonoBehaviour
 
     // Stop & Go behaviour variables.
     public float stoppingDistance = 0.5f;
-    public float stopTimeThreshold = 3.0f;
-    public float stopTime;
+    public float stopTimeThreshold = 1.0f;
+    private float stopTime;
 
     // bounding coefficients
     [Range(0.000001f, 1f)]
@@ -64,6 +71,7 @@ public class AgentControl : MonoBehaviour
     {
         agent = this.GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
+        animator = this.GetComponentInChildren<Animator>();
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         grid = gridComponent.grid;
         startingPosition = agent.gameObject.transform.position;
@@ -77,11 +85,11 @@ public class AgentControl : MonoBehaviour
 
 
     void Update() {
+        animator.SetFloat("velocity", agent.velocity.magnitude);
         CheckDestinationReached();
         GapSeekingBehaviour();
         FollowingBehaviour();
         StopAndGoBehaviour();
-        OvertakingBehaviour();
     }
 
     void CheckDestinationReached()
@@ -112,10 +120,12 @@ public class AgentControl : MonoBehaviour
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
             stopTime = Time.time + stopTimeThreshold;
+            UpdateAgentMaterial();
         } else if (behaviour == AgentBehaviourType.StopAndGo && stopTime < Time.time)
         {
             agent.isStopped = false;
             behaviour = AgentBehaviourType.Default;
+            UpdateAgentMaterial();
         }
     }
 
@@ -133,11 +143,40 @@ public class AgentControl : MonoBehaviour
 
                 DrawGap(selectedGap, Color.green);
                 GapSeeking(selectedGap);
+                UpdateAgentMaterial();
             }
         } else if (ShouldEndSeeking())
         {
             EndSeeking();
+            UpdateAgentMaterial();
         }
+    }
+
+    public void FollowingBehaviour()
+    {
+        if (isFollower && behaviour == AgentBehaviourType.Default)
+        {
+            List<GameObject> candidates = FolloweeDetection();
+            GameObject selectedFollowee = FolloweeSelection(candidates);
+
+            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
+            if (selectedFollowee != null)
+            {
+                Debug.Log("Starting following");
+                Following(selectedFollowee);
+                UpdateAgentMaterial();
+            }
+        }
+        else if (ShouldEndFollowing())
+        {
+            EndFollowing();
+            UpdateAgentMaterial();
+        }
+        else if (behaviour == AgentBehaviourType.Following)
+        {
+            UpdateFollowingDestination();
+        }
+
     }
 
     // Gap selection
@@ -188,7 +227,31 @@ public class AgentControl : MonoBehaviour
             }
         }
 
-        // TODO: 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
+        // 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
+        int seekerId = agent.gameObject.GetInstanceID();
+        foreach (Gap gap in gaps) // Add agents gaps to the global possible gaps array.
+        {
+            grid.possibleGaps.Add(new PossibleGap(seekerId, gap));
+        }
+
+
+        for (int i = gaps.Count - 1; i >= 0; i--) // Filter gaps that are equal and the agent is not closest to.
+        {
+            foreach (PossibleGap pg in grid.possibleGaps)
+            {
+                if (pg.seekerId == seekerId)
+                {
+                    continue;
+                }
+
+                if (pg.gap.IsEqual(gaps[i]) && pg.gap.agentToCenter.magnitude < gaps[i].agentToCenter.magnitude)
+                {
+                    gaps.RemoveAt(i);
+                }
+            }
+        }
+        grid.possibleGaps = grid.possibleGaps.FindAll(pg => pg.seekerId != seekerId);
+
 
         // Finally select the gap that has the minimum angle between the gap and the destination.
         if (gaps.Count > 0) {
@@ -288,32 +351,7 @@ public class AgentControl : MonoBehaviour
         return Mathf.Clamp(probability, 0, 1);
     }
 
-    // Following
-    public void FollowingBehaviour()
-    {
-        if (isFollower && behaviour == AgentBehaviourType.Default)
-        {
-            List<GameObject> candidates = FolloweeDetection();
-            GameObject selectedFollowee = FolloweeSelection(candidates);
-
-            Debug.Log("Followee: " + selectedFollowee != null, selectedFollowee);
-            if (selectedFollowee != null)
-            {
-                Debug.Log("Starting following");
-                Following(selectedFollowee);
-            }
-        }
-        else if (ShouldEndFollowing())
-        {
-            EndFollowing();
-        }
-        else if (behaviour == AgentBehaviourType.Following)
-        {
-            UpdateFollowingDestionation();
-        }
-
-    }
-    public List<GameObject> FolloweeDetection() // TODO: test if this works
+    public List<GameObject> FolloweeDetection()
     {
         // get agent direction and find agents in front
         HashSet<GameObject> candidates = new HashSet<GameObject>();
@@ -349,13 +387,15 @@ public class AgentControl : MonoBehaviour
 
     public GameObject FolloweeSelection(List<GameObject> followeeCandidates)
     {
-        // check angle
+        // Check angle.
+        Vector3 followerDirection = destination - agent.gameObject.transform.position;
         IEnumerable<GameObject> followeeCandidatesF = followeeCandidates.Where(obj =>
         {
-            return Vector3.Angle(agent.gameObject.transform.forward, obj.transform.forward) <= (deviationAngle / 2);
+            return Vector3.Angle(followerDirection, obj.transform.forward) <= (deviationAngle / 2);
         });
         Debug.Log("Followee candidates after angle: " + followeeCandidatesF.ToList().Count);
-        // check if already followed
+
+        // Check if already followed.
         followeeCandidatesF = followeeCandidates.Where(obj =>
         {
             if (obj.TryGetComponent(typeof(AgentControl), out Component component))
@@ -370,8 +410,9 @@ public class AgentControl : MonoBehaviour
             }
             return false;
         });
+
         Debug.Log("Followee candidates after already followed: " + followeeCandidatesF.ToList().Count);
-        // probability selection
+        // Probability selection.
         List<GameObject> filteredList = followeeCandidatesF.ToList();
         if (filteredList.Count == 0)
         {
@@ -424,7 +465,6 @@ public class AgentControl : MonoBehaviour
         {
             if (target.TryGetComponent(typeof(AgentControl), out Component component))
             {
-                // do stuff
                 followingStart = Time.time;
                 followingDuration = duration;
                 followingTarget = target;
@@ -472,7 +512,7 @@ public class AgentControl : MonoBehaviour
         }
     }
 
-    public void UpdateFollowingDestionation()
+    public void UpdateFollowingDestination()
     {
         if (Vector3.Distance(agent.destination, followingTarget.transform.position) > 0.1f)
         {
@@ -490,5 +530,31 @@ public class AgentControl : MonoBehaviour
         Debug.DrawLine(new Vector3(p2.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), color, duration);
         Debug.DrawLine(new Vector3(p2.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p2.z), color, duration);
         Debug.DrawLine(new Vector3(p1.x, 0.1f, p2.z), new Vector3(p1.x, 0.1f, p1.z), color, duration);
+    }
+
+    public void UpdateAgentMaterial()
+    {
+        switch (behaviour)
+        {
+            case AgentBehaviourType.GapSeeking:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = gapSeakingMaterial;
+                break;
+
+            case AgentBehaviourType.Following:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = followingMaterial;
+                break;
+
+            case AgentBehaviourType.StopAndGo:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = stopAndGoMaterial;
+                break;
+
+            case AgentBehaviourType.Overtaking:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = overtakingMaterial;
+                break;
+
+            default:
+                this.GetComponentInChildren<SkinnedMeshRenderer>().material = defaultMaterial;
+                break;
+        }
     }
 }
