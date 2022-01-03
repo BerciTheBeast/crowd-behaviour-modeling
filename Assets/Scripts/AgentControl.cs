@@ -214,7 +214,31 @@ public class AgentControl : MonoBehaviour
             }
         }
 
-        // TODO: 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
+        // 4. Filter out gaps that the agent is not closest too, and are searched by other agents.
+        int seekerId = agent.gameObject.GetInstanceID();
+        foreach (Gap gap in gaps) // Add agents gaps to the global possible gaps array.
+        {
+            grid.possibleGaps.Add(new PossibleGap(seekerId, gap));
+        }
+
+
+        for (int i = gaps.Count - 1; i >= 0; i--) // Filter gaps that are equal and the agent is not closest to.
+        {
+            foreach (PossibleGap pg in grid.possibleGaps)
+            {
+                if (pg.seekerId == seekerId)
+                {
+                    continue;
+                }
+
+                if (pg.gap.IsEqual(gaps[i]) && pg.gap.agentToCenter.magnitude < gaps[i].agentToCenter.magnitude)
+                {
+                    gaps.RemoveAt(i);
+                }
+            }
+        }
+        grid.possibleGaps = grid.possibleGaps.FindAll(pg => pg.seekerId != seekerId);
+
 
         // Finally select the gap that has the minimum angle between the gap and the destination.
         if (gaps.Count > 0) {
@@ -314,7 +338,7 @@ public class AgentControl : MonoBehaviour
         return Mathf.Clamp(probability, 0, 1);
     }
 
-    public List<GameObject> FolloweeDetection() // TODO: test if this works
+    public List<GameObject> FolloweeDetection()
     {
         // get agent direction and find agents in front
         HashSet<GameObject> candidates = new HashSet<GameObject>();

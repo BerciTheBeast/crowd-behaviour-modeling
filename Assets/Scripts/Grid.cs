@@ -11,7 +11,8 @@ public class Grid
     private Vector3 originPosition;
     private int[,] gridArray;
     private TextMesh[,] debugTextArray;
-
+    public List<PossibleGap> possibleGaps;
+   
     public Grid(int width, int height, float cellSize, Vector3 originPosition, bool isVisible = false)
     {
         this.width = width;
@@ -21,6 +22,7 @@ public class Grid
 
         gridArray = new int[width, height];
         debugTextArray = new TextMesh[width, height];
+        possibleGaps = new List<PossibleGap>();
 
         if (isVisible)
         {
