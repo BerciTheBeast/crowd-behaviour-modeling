@@ -43,6 +43,7 @@ public class AgentControl : MonoBehaviour
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
     public bool isGapSeeker = false;
     public bool isFollower = false;
+    public bool isOvertaker = false;
 
     private float seekingStart;
     private float seekingDuration;
@@ -87,9 +88,10 @@ public class AgentControl : MonoBehaviour
     void Update() {
         animator.SetFloat("velocity", agent.velocity.magnitude);
         CheckDestinationReached();
-        GapSeekingBehaviour();
-        FollowingBehaviour();
-        StopAndGoBehaviour();
+        // GapSeekingBehaviour();
+        // FollowingBehaviour();
+        // StopAndGoBehaviour();
+        OvertakingBehaviour();
     }
 
     void CheckDestinationReached()
@@ -101,12 +103,13 @@ public class AgentControl : MonoBehaviour
     }
 
     void OvertakingBehaviour() {
-        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 1000) == 1) // TODO: Probability.
+        if (isOvertaker && behaviour == AgentBehaviourType.Default &&  Random.Range(1, 10) == 1) // TODO: Probability.
         {
             behaviour = AgentBehaviourType.Overtaking;
+            UpdateAgentMaterial();
             // agent.isStopped = true;
             // stopTime = Time.time + stopTimeThreshold;
-        } else if (behaviour == AgentBehaviourType.Overtaking) // TODO: Add stopping condition
+        } else if (false) // TODO: Add stopping condition
         {
             // agent.isStopped = false;
             behaviour = AgentBehaviourType.Default;
