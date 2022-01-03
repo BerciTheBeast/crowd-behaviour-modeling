@@ -54,8 +54,8 @@ public class AgentControl : MonoBehaviour
 
     // Stop & Go behaviour variables.
     public float stoppingDistance = 0.5f;
-    public float stopTimeThreshold = 3.0f;
-    public float stopTime;
+    public float stopTimeThreshold = 1.0f;
+    private float stopTime;
 
     // bounding coefficients
     [Range(0.000001f, 1f)]
