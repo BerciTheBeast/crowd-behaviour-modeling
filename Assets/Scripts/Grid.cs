@@ -119,6 +119,34 @@ public class Grid
         );
     }
 
+    public void OvertakeGapDetection(Vector3 pos, Vector3 direction, int searchDepth, int searchWidth, int seeds, out Gap searchArea, out List<Gap> gaps) {
+        int x, y, x_dir, y_dir;
+
+        GetXY(pos, out x, out y);
+        GetXY(direction, out x_dir, out y_dir);
+
+        Vector2 dir_vec = new Vector2(x_dir, y_dir);
+        dir_vec.Normalize();
+
+        Vector2 dir_vec_perp = new Vector2(dir_vec.y, -dir_vec.x);
+        Vector2 pos_vec = new Vector2(x, y);
+        Vector2 pt1 =  pos_vec + dir_vec * searchDepth - dir_vec_perp * (searchWidth / 2);
+        Vector2 pt2 =  pos_vec + dir_vec_perp * (searchWidth / 2);
+
+        // TODO: Calculate the exploration area
+        List<Vector2> explorationArea = new List<Vector2>();
+        for (int i = Mathf.Max(0, x - searchDist); i <= Mathf.Min(width - 1, x + searchDist); i ++)
+        {
+            for (int j = Mathf.Max(0, y - searchDist); j <= Mathf.Min(height - 1, y + searchDist); j++)
+            {
+                if (GetValue(i, j) == 0) explorationArea.Add(new Vector2(i, j));
+            }
+        }  
+
+        searchArea = new Gap(pt1, pt2);
+        gaps = ExpandAndFilterExplorationArea(explorationArea, seeds);
+    }
+
     public List<Gap> GapDetection(Vector3 pos, int searchDist, int seeds)
     {        
         int x, y;
@@ -133,6 +161,11 @@ public class Grid
             }
         }
 
+        
+        return ExpandAndFilterExplorationArea(explorationArea, seeds);
+    }
+
+    private List<Gap> ExpandAndFilterExplorationArea(List<Vector2> explorationArea, int seeds) {
         List<Vector2> seedPoints = explorationArea.OrderBy(arg => System.Guid.NewGuid()).Take(seeds).ToList();
         List<Gap> detectedGaps = new List<Gap>();
         foreach (Vector2 seed in seedPoints)

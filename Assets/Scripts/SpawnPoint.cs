@@ -107,6 +107,7 @@ public class SpawnPoint : MonoBehaviour
         if (count < 1) {
             count++;
             capsule.GetComponent<AgentControl>().isOvertaker = true;
+
         }
         // if (count < 1)
         // {

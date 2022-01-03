@@ -251,12 +251,15 @@ MonoBehaviour:
   behaviour: 0
   isGapSeeker: 0
   isFollower: 0
+  isOvertaker: 0
   followedBy: {fileID: 0}
   followingTarget: {fileID: 0}
   followingStart: 0
   followingDuration: 0
   stoppingDistance: 0.5
   stopTimeThreshold: 1
+  overtakeSearchDepth: 20
+  overtakeSearchWidth: 15
   alpha: 0.5
   beta: 0.75
   lambda: 2.3

@@ -58,6 +58,11 @@ public class AgentControl : MonoBehaviour
     public float stopTimeThreshold = 1.0f;
     private float stopTime;
 
+    // Overtaking variables
+    public int overtakeSearchDepth = 5;
+    public int overtakeSearchWidth = 50;
+    public float overtakingAgentSpeed = 2f;
+
     // bounding coefficients
     [Range(0.000001f, 1f)]
     public float alpha = 0.5f;
@@ -72,6 +77,9 @@ public class AgentControl : MonoBehaviour
     {
         agent = this.GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stoppingDistance;
+        if (isOvertaker) {
+            agent.speed = overtakingAgentSpeed;
+        }
         animator = this.GetComponentInChildren<Animator>();
         gridComponent = (GridComponent)GameObject.Find("Plane").GetComponent<GridComponent>();
         grid = gridComponent.grid;
@@ -96,16 +104,26 @@ public class AgentControl : MonoBehaviour
 
     void CheckDestinationReached()
     {
-        if (respawn && Vector3.Distance(agent.gameObject.transform.position, destination)  <= 1.0f)
-        {
+        if (respawn && Vector3.Distance(agent.gameObject.transform.position, destination) <= 0.75f)
+        {   
+            // this.behaviour = AgentBehaviourType.Default;
             this.origin.Respawn(agent.gameObject);
         }
     }
 
     void OvertakingBehaviour() {
-        if (isOvertaker && behaviour == AgentBehaviourType.Default &&  Random.Range(1, 10) == 1) // TODO: Probability.
+        if (isOvertaker)// && behaviour == AgentBehaviourType.Default)// &&  Random.Range(1, 10) == 1) // TODO: Probability.
         {
             behaviour = AgentBehaviourType.Overtaking;
+
+            List<Gap> gaps;
+            Gap searchArea;
+            grid.OvertakeGapDetection(agent.gameObject.transform.position, destination, overtakeSearchDepth, overtakeSearchWidth, seeds, out searchArea, out gaps);
+           
+            DrawGap(searchArea, Color.red, 0f);
+            Vector3 p1 = grid.GetWorldPosition((int)searchArea.p1.x, (int)searchArea.p1.y);
+            Vector3 p2 = grid.GetWorldPosition((int)searchArea.p2.x, (int)searchArea.p2.y);
+            Debug.DrawLine(new Vector3(p1.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), Color.red, 0f);
             UpdateAgentMaterial();
             // agent.isStopped = true;
             // stopTime = Time.time + stopTimeThreshold;
