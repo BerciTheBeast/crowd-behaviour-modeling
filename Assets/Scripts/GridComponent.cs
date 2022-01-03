@@ -13,11 +13,14 @@ public class GridComponent : MonoBehaviour
     HashSet<GameObject> followers = new HashSet<GameObject>();
 
     [Min(0.1f)]
-    public float cellSize = 10f;
+    public float cellSize = 0.1f;
 
     void Start()
     {
         Renderer rend = GetComponent<Renderer>();
+        Debug.Log("Rend bounds x" + rend.bounds.size.x);
+        Debug.Log("Rend bounds z" + rend.bounds.size.z);
+
         origin = -new Vector3(rend.bounds.size.x / 2, 0, rend.bounds.size.z / 2);
         grid = new Grid(Mathf.FloorToInt(rend.bounds.size.x / cellSize), Mathf.FloorToInt(rend.bounds.size.z / cellSize), cellSize, origin, isVisible);
         grid.UpdateOccupancy();
