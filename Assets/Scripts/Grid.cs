@@ -130,18 +130,42 @@ public class Grid
         Vector2 direction_vec = dest_vec - pos_vec;
         Vector2 direction_vec_norm = direction_vec;
 
+        float des_vec_angle = Vec2Angle(direction_vec_norm);
+
+        if (des_vec_angle < 135 && des_vec_angle >= 45)
+        {
+            direction_vec_norm = new Vector2(1, 0);
+
+        }
+        else if (des_vec_angle < 225 && des_vec_angle >= 135)
+        {
+            direction_vec_norm = new Vector2(0, 1);
+
+            
+        }
+        else if (des_vec_angle < 315 && des_vec_angle >= 225)
+        {
+            direction_vec_norm = new Vector2(-1, 0);
+
+            
+        } 
+        else 
+        {
+            direction_vec_norm = new Vector2(0, -1);
+
+        }
         direction_vec_norm.Normalize();
 
         Vector2 dir_vec_perp = new Vector2(direction_vec_norm.y, -direction_vec_norm.x);
-        Vector2 pt1 =  pos_vec + direction_vec_norm * searchDepth - dir_vec_perp * (searchWidth / 2);
-        Vector2 pt2 =  pos_vec + dir_vec_perp * (searchWidth / 2);
+        dir_vec_perp.Normalize();
+        Vector2 pt1 = pos_vec + direction_vec_norm * searchDepth - dir_vec_perp * (searchWidth / 2);
+        Vector2 pt2 = pos_vec + dir_vec_perp * (searchWidth / 2);
+
 
         int i_start, i_end, j_start, j_end;
         i_start = i_end = j_start = j_end = 0;
 
         float direction_angle = Vec2Angle(direction_vec);
-
-        Debug.Log("Angle: " + direction_angle);
 
         if (direction_angle >= 45 && 135 > direction_angle)
         {
@@ -172,10 +196,6 @@ public class Grid
             j_end = Mathf.Min(width - 1, y + searchDepth);
         }
 
-        Debug.Log("i_start, end: " + i_start + " " + i_end);
-        Debug.Log("j_start, end: " + j_start + " " + j_end);
-
-
         List<Vector2> explorationArea = new List<Vector2>();
         for (int i = i_start; i <= i_end; i ++)
         {
@@ -184,10 +204,8 @@ public class Grid
                 if (GetValue(i, j) == 0) explorationArea.Add(new Vector2(i, j));
             }
         }  
-
+        Debug.Log("Length: " + (pt1.x - pt2.x));
         searchArea = new Gap(pt1, pt2);
-        Debug.Log("Excploration area size: " + explorationArea.Count);
-
         return ExpandAndFilterExplorationArea(explorationArea, seeds);
     }
 

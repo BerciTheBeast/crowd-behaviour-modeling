@@ -62,6 +62,8 @@ public class AgentControl : MonoBehaviour
     public int overtakeSearchDepth = 5;
     public int overtakeSearchWidth = 50;
     public float overtakingAgentSpeed = 2f;
+    public int sideGapAngleThresh = 15;
+    public float gapMaxSideToSearchAreaRatio = 0.5f;
 
     // bounding coefficients
     [Range(0.000001f, 1f)]
@@ -96,10 +98,10 @@ public class AgentControl : MonoBehaviour
     void Update() {
         animator.SetFloat("velocity", agent.velocity.magnitude);
         CheckDestinationReached();
-        GapSeekingBehaviour();
-        FollowingBehaviour();
-        StopAndGoBehaviour();
-        // OvertakingBehaviour();
+        // GapSeekingBehaviour();
+        // FollowingBehaviour();
+        // StopAndGoBehaviour();
+        OvertakingBehaviour();
     }
 
     void CheckDestinationReached()
@@ -118,21 +120,16 @@ public class AgentControl : MonoBehaviour
 
             Gap searchArea;
             List<Gap> gaps = grid.OvertakeGapDetection(agent.gameObject.transform.position, destination, overtakeSearchDepth, overtakeSearchWidth, seeds, out searchArea);
-            Debug.Log("Gap count: " + gaps.Count);
             DrawGap(searchArea, Color.blue, 0f);
             UpdateAgentMaterial();
-            foreach (var gap in gaps)
-            {
-                DrawGap(gap, Color.green, 0f);
+
+            (Gap frontGap, Gap sideGap) = OvertakeGapSelection(gaps, searchArea);
+
+            if (frontGap != null && sideGap != null) {
+                DrawGap(frontGap, Color.green, 1f);
+                DrawGap(sideGap, Color.green, 1f);
+                Overtake(frontGap, sideGap);
             }
-            Gap selectedGap = OvertakeGapSelection(gaps);
-
-            if (selectedGap != null) {
-                DrawGap(selectedGap, Color.red, 0f);
-            }
-
-
-            
 
             // agent.isStopped = true;
             // stopTime = Time.time + stopTimeThreshold;
@@ -143,10 +140,95 @@ public class AgentControl : MonoBehaviour
         }
     }
 
-    Gap OvertakeGapSelection(List<Gap> gaps) 
+    void Overtake(Gap frontGap, Gap sideGap) {
+
+    }
+
+    (Gap frontGap, Gap sideGap) OvertakeGapSelection(List<Gap> gaps, Gap searchArea) 
     {
+        // Filter gaps that are too small for our agent.
+        for (int i = gaps.Count - 1; i >= 0; i--)
+        {
+            Gap gap = gaps[i];
+            Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
+            Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
+            float gapWidth = Mathf.Abs(p1.x - p2.x);
+            float gapHeight = Mathf.Abs(p1.z - p2.z);
+            Vector3 agentScale = agent.gameObject.transform.localScale;
+
+            print(agent.radius * Mathf.Max(agentScale.x, agentScale.z));
+            if (Mathf.Min(gapWidth, gapHeight) < 2 * (agent.radius * Mathf.Max(agentScale.x, agentScale.z)))
+            {
+                gaps.RemoveAt(i);
+            }
+        }
+
+        Vector3 agentPos = agent.gameObject.transform.position;
+        Vector3 agentToDestination = destination - agentPos;
+        Vector3 searchArea_p1 = grid.GetWorldPosition((int)searchArea.p1.x, (int)searchArea.p1.y);
+        Vector3 searchArea_p2 = grid.GetWorldPosition((int)searchArea.p2.x, (int)searchArea.p2.y);
+        Vector3 searchAreaCenter = (searchArea_p1 + searchArea_p2) / 2;
+        // Debug.DrawLine(agentPos, searchAreaCenter, Color.red, 0f);
         // We need to first find a gap that is in front of an agent we want to overtake, then there needs to be a gap to the left or right of him
-        return null;
+
+        // Filter out gaps that have their centre point too close to the agent --> candidates for the front gap
+        List<Gap> frontGapCandidates = new List<Gap>();
+        for (int i = gaps.Count - 1; i >= 0; i--)
+        {
+            Gap gap = gaps[i];
+            Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
+            Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
+            Vector3 gapCenter = (p1 + p2) / 2;
+
+            float gapWidth = Mathf.Abs(gap.p1.x - gap.p2.x);
+            float gapHeight = Mathf.Abs(gap.p1.y - gap.p2.y);
+            float maxSide = Mathf.Max(gapWidth, gapHeight);
+
+            float agentToAreaCenterDist = (searchAreaCenter - agentPos).magnitude;
+            float agentToGapDist = (gapCenter - agentPos).magnitude;
+
+            if (agentToGapDist > (1.5 * agentToAreaCenterDist) && maxSide > (overtakeSearchWidth * gapMaxSideToSearchAreaRatio)) {
+                frontGapCandidates.Add(gap);
+            }
+        }
+
+        // Return if no front gaps are found
+        if (frontGapCandidates.Count == 0) {
+            return (null, null);
+        }
+
+        // Find side gap candidates
+        List<Gap> sideGapCandidates = new List<Gap>();
+        for (int i = gaps.Count - 1; i >= 0; i--)
+        {
+            Gap gap = gaps[i];
+            Vector3 p1 = grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y);
+            Vector3 p2 = grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y);
+            Vector3 gapCenter = (p1 + p2) / 2;
+
+            Vector3 areaCenterToAgent = agentPos - searchAreaCenter;
+            Vector3 areaCenterToGap = gapCenter - searchAreaCenter;
+            float angle = Vector3.Angle(areaCenterToAgent, areaCenterToGap);
+
+            float gapWidth = Mathf.Abs(gap.p1.x - gap.p2.x);
+            float gapHeight = Mathf.Abs(gap.p1.y - gap.p2.y);
+            float maxSide = Mathf.Max(gapWidth, gapHeight);
+
+            // Add the distance from center to gap center --> should be above a threshold
+            // Filter gaps that are of inappropriate shape
+            if (angle > (90 - sideGapAngleThresh) && angle < (90 + sideGapAngleThresh) && maxSide > (overtakeSearchDepth * gapMaxSideToSearchAreaRatio)) {
+                sideGapCandidates.Add(gap);
+            }
+        }
+
+        if (sideGapCandidates.Count == 0) {
+            return (null, null);
+        }
+
+        Gap frontGap = frontGapCandidates.OrderByDescending(el => (Mathf.Abs(el.p1.x - el.p2.x) * Mathf.Abs(el.p1.y - el.p2.y))).First();
+        Gap sideGap = sideGapCandidates.OrderByDescending(el => (Mathf.Abs(el.p1.x - el.p2.x) * Mathf.Abs(el.p1.y - el.p2.y))).First();
+
+        return (frontGap, sideGap);
     }
 
     void StopAndGoBehaviour()

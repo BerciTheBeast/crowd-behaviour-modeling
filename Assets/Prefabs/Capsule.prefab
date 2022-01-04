@@ -259,7 +259,8 @@ MonoBehaviour:
   stoppingDistance: 0.5
   stopTimeThreshold: 1
   overtakeSearchDepth: 20
-  overtakeSearchWidth: 15
+  overtakeSearchWidth: 20
+  overtakingAgentSpeed: 2
   alpha: 0.5
   beta: 0.75
   lambda: 2.3
