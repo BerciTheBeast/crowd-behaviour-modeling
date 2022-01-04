@@ -116,15 +116,28 @@ public class AgentControl : MonoBehaviour
         {
             behaviour = AgentBehaviourType.Overtaking;
 
-            List<Gap> gaps;
             Gap searchArea;
-            grid.OvertakeGapDetection(agent.gameObject.transform.position, destination, overtakeSearchDepth, overtakeSearchWidth, seeds, out searchArea, out gaps);
+            List<Gap> gaps = grid.OvertakeGapDetection(agent.gameObject.transform.position, destination, overtakeSearchDepth, overtakeSearchWidth, seeds, out searchArea);
            
             DrawGap(searchArea, Color.red, 0f);
             Vector3 p1 = grid.GetWorldPosition((int)searchArea.p1.x, (int)searchArea.p1.y);
             Vector3 p2 = grid.GetWorldPosition((int)searchArea.p2.x, (int)searchArea.p2.y);
             Debug.DrawLine(new Vector3(p1.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), Color.red, 0f);
+
+            Vector3 dest_vec = destination;
+            Vector3 agent_pos = agent.gameObject.transform.position;
+
+            // dest_vec.Normalize();
+
+            Debug.DrawLine(new Vector3(agent_pos.x, 0.1f, agent_pos.z), new Vector3(dest_vec.x, 0.1f, dest_vec.z), Color.green, 0f);
             UpdateAgentMaterial();
+
+            // Debug.Log("N gaps: " + gaps.Count);
+            foreach (var gap in gaps)
+            {
+                DrawGap(gap, Color.green, 0f);
+            }
+
             // agent.isStopped = true;
             // stopTime = Time.time + stopTimeThreshold;
         } else if (false) // TODO: Add stopping condition
