@@ -152,26 +152,28 @@ public class Grid
         } 
         else if (direction_angle >= 135 && 225 > direction_angle)
         {
-
-            i_start = Mathf.Max(0, y + (searchWidth / 2));
-            i_end = Mathf.Min(height - 1, y + (searchWidth / 2));
-            j_start = Mathf.Max(0, x);
-            j_end = Mathf.Min(width - 1, x + searchDepth);
+            i_start = Mathf.Max(0, x - (searchWidth / 2));
+            i_end = Mathf.Min(height - 1, x + (searchWidth / 2));
+            j_start = Mathf.Min(width - 1, y - searchDepth);
+            j_end = Mathf.Max(0, y);
         } 
         else if (direction_angle >= 225 && 315 > direction_angle)
         {
-            i_start = Mathf.Max(0, x);
-            i_end = Mathf.Min(width - 1, x - searchDepth);
+            i_start = Mathf.Min(width - 1, x - searchDepth);
+            i_end = Mathf.Max(0, x);
             j_start = Mathf.Max(0, y - (searchWidth / 2));
             j_end = Mathf.Min(height - 1, y + (searchWidth / 2));
         } 
         else 
         {
-            i_start = Mathf.Max(0, y - (searchWidth / 2));
-            i_end = Mathf.Min(height - 1, y + (searchWidth / 2));
-            j_start = Mathf.Max(0, x);
-            j_end = Mathf.Min(width - 1, x - searchDepth);
+            i_start = Mathf.Max(0, x - (searchWidth / 2));
+            i_end = Mathf.Min(height - 1, x + (searchWidth / 2));
+            j_start = Mathf.Max(0, y);
+            j_end = Mathf.Min(width - 1, y + searchDepth);
         }
+
+        Debug.Log("i_start, end: " + i_start + " " + i_end);
+        Debug.Log("j_start, end: " + j_start + " " + j_end);
 
 
         List<Vector2> explorationArea = new List<Vector2>();
@@ -184,6 +186,8 @@ public class Grid
         }  
 
         searchArea = new Gap(pt1, pt2);
+        Debug.Log("Excploration area size: " + explorationArea.Count);
+
         return ExpandAndFilterExplorationArea(explorationArea, seeds);
     }
 
@@ -201,7 +205,6 @@ public class Grid
             }
         }
 
-        
         return ExpandAndFilterExplorationArea(explorationArea, seeds);
     }
 

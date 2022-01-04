@@ -118,25 +118,21 @@ public class AgentControl : MonoBehaviour
 
             Gap searchArea;
             List<Gap> gaps = grid.OvertakeGapDetection(agent.gameObject.transform.position, destination, overtakeSearchDepth, overtakeSearchWidth, seeds, out searchArea);
-           
-            DrawGap(searchArea, Color.red, 0f);
-            Vector3 p1 = grid.GetWorldPosition((int)searchArea.p1.x, (int)searchArea.p1.y);
-            Vector3 p2 = grid.GetWorldPosition((int)searchArea.p2.x, (int)searchArea.p2.y);
-            Debug.DrawLine(new Vector3(p1.x, 0.1f, p1.z), new Vector3(p2.x, 0.1f, p2.z), Color.red, 0f);
-
-            Vector3 dest_vec = destination;
-            Vector3 agent_pos = agent.gameObject.transform.position;
-
-            // dest_vec.Normalize();
-
-            Debug.DrawLine(new Vector3(agent_pos.x, 0.1f, agent_pos.z), new Vector3(dest_vec.x, 0.1f, dest_vec.z), Color.green, 0f);
+            Debug.Log("Gap count: " + gaps.Count);
+            DrawGap(searchArea, Color.blue, 0f);
             UpdateAgentMaterial();
-
-            // Debug.Log("N gaps: " + gaps.Count);
             foreach (var gap in gaps)
             {
                 DrawGap(gap, Color.green, 0f);
             }
+            Gap selectedGap = OvertakeGapSelection(gaps);
+
+            if (selectedGap != null) {
+                DrawGap(selectedGap, Color.red, 0f);
+            }
+
+
+            
 
             // agent.isStopped = true;
             // stopTime = Time.time + stopTimeThreshold;
@@ -147,9 +143,15 @@ public class AgentControl : MonoBehaviour
         }
     }
 
+    Gap OvertakeGapSelection(List<Gap> gaps) 
+    {
+        // We need to first find a gap that is in front of an agent we want to overtake, then there needs to be a gap to the left or right of him
+        return null;
+    }
+
     void StopAndGoBehaviour()
     {
-        if (behaviour == AgentBehaviourType.Default &&  Random.Range(1, 1000) == 1) // TODO: Probability.
+        if (behaviour == AgentBehaviourType.Default && Random.Range(1, 1000) == 1) // TODO: Probability.
         {
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
