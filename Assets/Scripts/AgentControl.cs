@@ -96,10 +96,10 @@ public class AgentControl : MonoBehaviour
     void Update() {
         animator.SetFloat("velocity", agent.velocity.magnitude);
         CheckDestinationReached();
-        // GapSeekingBehaviour();
-        // FollowingBehaviour();
-        // StopAndGoBehaviour();
-        OvertakingBehaviour();
+        GapSeekingBehaviour();
+        FollowingBehaviour();
+        StopAndGoBehaviour();
+        // OvertakingBehaviour();
     }
 
     void CheckDestinationReached()

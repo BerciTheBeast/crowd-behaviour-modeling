@@ -104,25 +104,25 @@ public class SpawnPoint : MonoBehaviour
         GameObject capsule = (GameObject)Instantiate(entity, CalculateRandomPoint(), Quaternion.identity);
         capsule.GetComponent<AgentControl>().destination = destination.CalculateRandomPoint();
         capsule.GetComponent<AgentControl>().origin = this;
-        if (count < 1) {
-            count++;
-            capsule.GetComponent<AgentControl>().isOvertaker = true;
-
-        }
-        // if (count < 1)
-        // {
-        //     count++;
-        //     capsule.GetComponent<AgentControl>().isGapSeeker = true;
-        //     grid.AddGapSeeker(capsule);
-        // } else if (count < 4)
-        // {
-        //     count++;
-        //     capsule.GetComponent<AgentControl>().isFollower = true;
-        //     grid.AddFollower(capsule);
-        // } else if (count < 7) {
+        // if (count < 1) {
         //     count++;
         //     capsule.GetComponent<AgentControl>().isOvertaker = true;
+
         // }
+        if (count < 1)
+        {
+            count++;
+            capsule.GetComponent<AgentControl>().isGapSeeker = true;
+            grid.AddGapSeeker(capsule);
+        } else if (count < 4)
+        {
+            count++;
+            capsule.GetComponent<AgentControl>().isFollower = true;
+            grid.AddFollower(capsule);
+        } else if (count < 7) {
+            count++;
+            capsule.GetComponent<AgentControl>().isOvertaker = true;
+        }
     }
 
     public void Respawn(GameObject capsule)
