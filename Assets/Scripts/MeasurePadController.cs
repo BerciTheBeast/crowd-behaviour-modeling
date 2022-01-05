@@ -90,6 +90,10 @@ public class MeasurePadController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (!other.gameObject.name.Contains("Capsule"))
+        {
+            return;
+        }
         // What to when something exits
         float avgDensity = (float)agentCounts[other.gameObject].Sum() / (float)agentCounts[other.gameObject].Count;
         float avgSpeed = agentSpeeds[other.gameObject].Sum() / agentSpeeds[other.gameObject].Count;
