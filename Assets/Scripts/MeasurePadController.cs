@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MeasurePadController : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class MeasurePadController : MonoBehaviour
     public float period = 0.1f;
     private float area;
 
+    IDictionary<GameObject, List<float>> agentSpeeds = new Dictionary<GameObject, List<float>>();
+    IDictionary<GameObject, List<int>> agentCounts = new Dictionary<GameObject, List<int>>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +39,15 @@ public class MeasurePadController : MonoBehaviour
             Debug.Log("Density: " + GetDensity());
         }
         */
+        int count = GetAgentsOnPad().Count;
+        foreach (KeyValuePair<GameObject, List<float>> entry in agentSpeeds)
+        {
+            entry.Value.Add(GetGameObjectVelocity(entry.Key));
+        }
+        foreach (KeyValuePair<GameObject, List<int>> entry in agentCounts)
+        {
+            entry.Value.Add(count);
+        }
     }
 
     public List<GameObject> GetAgentsOnPad()
@@ -63,15 +76,31 @@ public class MeasurePadController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!other.gameObject.name.Contains("Capsule"))
+        {
+            return;
+        }
         // What to when something enters
-        // other.gameObject
-        Debug.Log("Enter");
+        agentSpeeds.Add(other.gameObject, new List<float>());
+        agentSpeeds[other.gameObject].Add(GetGameObjectVelocity(other.gameObject));
+
+        agentCounts.Add(other.gameObject, new List<int>());
+        agentCounts[other.gameObject].Add(GetAgentsOnPad().Count);
     }
 
     private void OnTriggerExit(Collider other)
     {
         // What to when something exits
-        // other.gameObject
-        Debug.Log("Exit");
+        float avgDensity = (float)agentCounts[other.gameObject].Sum() / (float)agentCounts[other.gameObject].Count;
+        float avgSpeed = agentSpeeds[other.gameObject].Sum() / agentSpeeds[other.gameObject].Count;
+        Debug.Log("Agent exited with avg density: " + avgDensity);
+        Debug.Log("Agent exited with avg speed: " + avgSpeed);
+        agentCounts.Remove(other.gameObject);
+        agentSpeeds.Remove(other.gameObject);
+    }
+
+    private float GetGameObjectVelocity(GameObject obj)
+    {
+        return obj.GetComponent<NavMeshAgent>().velocity.magnitude;
     }
 }
