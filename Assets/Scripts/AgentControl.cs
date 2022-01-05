@@ -387,7 +387,7 @@ public class AgentControl : MonoBehaviour
         });
 
         // Check if already followed.
-        followeeCandidatesF = followeeCandidates.Where(obj =>
+        followeeCandidatesF = followeeCandidatesF.Where(obj =>
         {
             if (obj.TryGetComponent(typeof(AgentControl), out Component component))
             {
