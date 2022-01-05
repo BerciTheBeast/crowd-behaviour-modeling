@@ -55,7 +55,8 @@ public class AgentControl : MonoBehaviour
 
     // Stop & Go behaviour variables.
     public float stoppingDistance = 0.5f;
-    public float stopTimeThreshold = 1.0f;
+    public float stopTimeMin = 1.0f;
+    public float stopTimeMax = 2.5f;
     private float stopTime;
 
     // Overtaking variables
@@ -256,7 +257,7 @@ public class AgentControl : MonoBehaviour
         {
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
-            stopTime = Time.time + stopTimeThreshold;
+            stopTime = Time.time + (float)(new System.Random().NextDouble() * (stopTimeMax - stopTimeMin) + stopTimeMin);
             UpdateAgentMaterial();
         } else if (behaviour == AgentBehaviourType.StopAndGo && stopTime < Time.time)
         {
