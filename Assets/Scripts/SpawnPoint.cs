@@ -104,6 +104,7 @@ public class SpawnPoint : MonoBehaviour
         GameObject capsule = (GameObject)Instantiate(entity, CalculateRandomPoint(), Quaternion.identity);
         capsule.GetComponent<AgentControl>().destination = destination.CalculateRandomPoint();
         capsule.GetComponent<AgentControl>().origin = this;
+        
         if (count < 1)
         {
             count++;
@@ -114,6 +115,13 @@ public class SpawnPoint : MonoBehaviour
             count++;
             capsule.GetComponent<AgentControl>().isFollower = true;
             grid.AddFollower(capsule);
+        } else if (count < 7) {
+            count++;
+            capsule.GetComponent<AgentControl>().isOvertaker = true;
+        } else if (count < 8) {
+            count++;
+            capsule.GetComponent<AgentControl>().isOvertaker = true;
+
         }
     }
 

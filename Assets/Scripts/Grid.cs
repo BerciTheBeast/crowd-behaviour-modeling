@@ -119,6 +119,95 @@ public class Grid
         );
     }
 
+    public List<Gap> OvertakeGapDetection(Vector3 pos, Vector3 direction, int searchDepth, int searchWidth, int seeds, out Gap searchArea) {
+        int x, y, x_dir, y_dir;
+
+        GetXY(pos, out x, out y);
+        GetXY(direction, out x_dir, out y_dir);
+        Vector2 pos_vec = new Vector2(x, y);
+        Vector2 dest_vec = new Vector2(x_dir, y_dir);
+
+        Vector2 direction_vec = dest_vec - pos_vec;
+        Vector2 direction_vec_norm = direction_vec;
+
+        float des_vec_angle = Vec2Angle(direction_vec_norm);
+
+        if (des_vec_angle < 135 && des_vec_angle >= 45)
+        {
+            direction_vec_norm = new Vector2(1, 0);
+
+        }
+        else if (des_vec_angle < 225 && des_vec_angle >= 135)
+        {
+            direction_vec_norm = new Vector2(0, 1);
+
+            
+        }
+        else if (des_vec_angle < 315 && des_vec_angle >= 225)
+        {
+            direction_vec_norm = new Vector2(-1, 0);
+
+            
+        } 
+        else 
+        {
+            direction_vec_norm = new Vector2(0, -1);
+
+        }
+        direction_vec_norm.Normalize();
+
+        Vector2 dir_vec_perp = new Vector2(direction_vec_norm.y, -direction_vec_norm.x);
+        dir_vec_perp.Normalize();
+        Vector2 pt1 = pos_vec + direction_vec_norm * searchDepth - dir_vec_perp * (searchWidth / 2);
+        Vector2 pt2 = pos_vec + dir_vec_perp * (searchWidth / 2);
+
+
+        int i_start, i_end, j_start, j_end;
+        i_start = i_end = j_start = j_end = 0;
+
+        float direction_angle = Vec2Angle(direction_vec);
+
+        if (direction_angle >= 45 && 135 > direction_angle)
+        {
+            i_start = Mathf.Max(0, x);
+            i_end = Mathf.Min(width - 1, x + searchDepth);
+            j_start = Mathf.Max(0, y - (searchWidth / 2));
+            j_end = Mathf.Min(height - 1, y + (searchWidth / 2));
+        } 
+        else if (direction_angle >= 135 && 225 > direction_angle)
+        {
+            i_start = Mathf.Max(0, x - (searchWidth / 2));
+            i_end = Mathf.Min(height - 1, x + (searchWidth / 2));
+            j_start = Mathf.Min(width - 1, y - searchDepth);
+            j_end = Mathf.Max(0, y);
+        } 
+        else if (direction_angle >= 225 && 315 > direction_angle)
+        {
+            i_start = Mathf.Min(width - 1, x - searchDepth);
+            i_end = Mathf.Max(0, x);
+            j_start = Mathf.Max(0, y - (searchWidth / 2));
+            j_end = Mathf.Min(height - 1, y + (searchWidth / 2));
+        } 
+        else 
+        {
+            i_start = Mathf.Max(0, x - (searchWidth / 2));
+            i_end = Mathf.Min(height - 1, x + (searchWidth / 2));
+            j_start = Mathf.Max(0, y);
+            j_end = Mathf.Min(width - 1, y + searchDepth);
+        }
+
+        List<Vector2> explorationArea = new List<Vector2>();
+        for (int i = i_start; i <= i_end; i ++)
+        {
+            for (int j = j_start; j <= j_end; j++)
+            {
+                if (GetValue(i, j) == 0) explorationArea.Add(new Vector2(i, j));
+            }
+        }  
+        searchArea = new Gap(pt1, pt2);
+        return ExpandAndFilterExplorationArea(explorationArea, seeds);
+    }
+
     public List<Gap> GapDetection(Vector3 pos, int searchDist, int seeds)
     {        
         int x, y;
@@ -133,6 +222,10 @@ public class Grid
             }
         }
 
+        return ExpandAndFilterExplorationArea(explorationArea, seeds);
+    }
+
+    private List<Gap> ExpandAndFilterExplorationArea(List<Vector2> explorationArea, int seeds) {
         List<Vector2> seedPoints = explorationArea.OrderBy(arg => System.Guid.NewGuid()).Take(seeds).ToList();
         List<Gap> detectedGaps = new List<Gap>();
         foreach (Vector2 seed in seedPoints)
@@ -291,4 +384,16 @@ public class Grid
         List<GameObject> limiterList = limiters.Where(obj => obj.name.Contains("Capsule")).ToList();
         return limiterList;
     }
+
+    private float Vec2Angle(Vector2 p_vector2)
+     {
+         if (p_vector2.x < 0)
+         {
+             return 360 - (Mathf.Atan2(p_vector2.x, p_vector2.y) * Mathf.Rad2Deg * -1);
+         }
+         else
+         {
+             return Mathf.Atan2(p_vector2.x, p_vector2.y) * Mathf.Rad2Deg;
+         }
+     }
 }

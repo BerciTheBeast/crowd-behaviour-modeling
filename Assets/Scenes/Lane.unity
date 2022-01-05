@@ -309,7 +309,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 278658841}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.01, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.2, y: 1, z: 0.4}
   m_Children: []
   m_Father: {fileID: 1544345346}
@@ -712,7 +712,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
@@ -720,7 +720,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -836,7 +836,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
