@@ -347,7 +347,6 @@ public class AgentControl : MonoBehaviour
             float gapHeight = Mathf.Abs(p1.z - p2.z);
             Vector3 agentScale = agent.gameObject.transform.localScale;
 
-            print(agent.radius * Mathf.Max(agentScale.x, agentScale.z));
             if (Mathf.Min(gapWidth, gapHeight) < 2 * (agent.radius * Mathf.Max(agentScale.x, agentScale.z)))
             {
                 gaps.RemoveAt(i);

@@ -78,7 +78,6 @@ public class SpawnPoint : MonoBehaviour
     {
         Corners.Clear(); // in case of transform changes corner points are reset
 
-        Debug.Log(VerticeList);
         Corners.Add(transform.TransformPoint(VerticeList[0])); // corner points are added to show  on the editor
         Corners.Add(transform.TransformPoint(VerticeList[10]));
         Corners.Add(transform.TransformPoint(VerticeList[110]));
