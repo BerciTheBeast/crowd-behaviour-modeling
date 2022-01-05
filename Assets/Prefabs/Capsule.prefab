@@ -193,7 +193,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2518359526414878494}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
@@ -261,6 +261,8 @@ MonoBehaviour:
   overtakeSearchDepth: 20
   overtakeSearchWidth: 20
   overtakingAgentSpeed: 2
+  sideGapAngleThresh: 15
+  gapMaxSideToSearchAreaRatio: 0.5
   alpha: 0.5
   beta: 0.75
   lambda: 2.3
