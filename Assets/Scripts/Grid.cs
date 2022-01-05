@@ -204,7 +204,6 @@ public class Grid
                 if (GetValue(i, j) == 0) explorationArea.Add(new Vector2(i, j));
             }
         }  
-        Debug.Log("Length: " + (pt1.x - pt2.x));
         searchArea = new Gap(pt1, pt2);
         return ExpandAndFilterExplorationArea(explorationArea, seeds);
     }

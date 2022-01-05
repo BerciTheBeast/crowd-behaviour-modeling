@@ -64,6 +64,9 @@ public class AgentControl : MonoBehaviour
     public float overtakingAgentSpeed = 2f;
     public int sideGapAngleThresh = 15;
     public float gapMaxSideToSearchAreaRatio = 0.5f;
+    private bool sideGapSeeking = false;
+    private Gap frontGap = null;
+    private Gap sideGap = null;
 
     // bounding coefficients
     [Range(0.000001f, 1f)]
@@ -98,9 +101,9 @@ public class AgentControl : MonoBehaviour
     void Update() {
         animator.SetFloat("velocity", agent.velocity.magnitude);
         CheckDestinationReached();
-        // GapSeekingBehaviour();
-        // FollowingBehaviour();
-        // StopAndGoBehaviour();
+        GapSeekingBehaviour();
+        FollowingBehaviour();
+        StopAndGoBehaviour();
         OvertakingBehaviour();
     }
 
@@ -108,44 +111,59 @@ public class AgentControl : MonoBehaviour
     {
         if (respawn && Vector3.Distance(agent.gameObject.transform.position, destination) <= 0.75f)
         {   
-            // this.behaviour = AgentBehaviourType.Default;
             this.origin.Respawn(agent.gameObject);
         }
     }
 
     void OvertakingBehaviour() {
-        if (isOvertaker)// && behaviour == AgentBehaviourType.Default)// &&  Random.Range(1, 10) == 1) // TODO: Probability.
+        if (isOvertaker && behaviour == AgentBehaviourType.Default)// &&  Random.Range(1, 10) == 1) // TODO: Probability.
         {
-            behaviour = AgentBehaviourType.Overtaking;
-
+            sideGapSeeking = false;
             Gap searchArea;
             List<Gap> gaps = grid.OvertakeGapDetection(agent.gameObject.transform.position, destination, overtakeSearchDepth, overtakeSearchWidth, seeds, out searchArea);
             DrawGap(searchArea, Color.blue, 0f);
-            UpdateAgentMaterial();
 
-            (Gap frontGap, Gap sideGap) = OvertakeGapSelection(gaps, searchArea);
+            (frontGap, sideGap) = OvertakeGapSelection(gaps, searchArea);
 
             if (frontGap != null && sideGap != null) {
-                DrawGap(frontGap, Color.green, 1f);
-                DrawGap(sideGap, Color.green, 1f);
-                Overtake(frontGap, sideGap);
+                DrawGap(frontGap, Color.green, 3f);
+                DrawGap(sideGap, Color.green, 3f);
+                sideGapSeeking = true;
+                behaviour = AgentBehaviourType.Overtaking;
+                GapSeeking(sideGap);
+                UpdateAgentMaterial();
             }
-
-            // agent.isStopped = true;
-            // stopTime = Time.time + stopTimeThreshold;
-        } else if (false) // TODO: Add stopping condition
+        } 
+        else if (isOvertaker && ShouldEndOvertaking() && sideGapSeeking)
         {
-            // agent.isStopped = false;
-            behaviour = AgentBehaviourType.Default;
+            sideGapSeeking = false;
+            GapSeeking(frontGap);
+
+        } 
+        else if (isOvertaker && ShouldEndOvertaking())
+        {
+            EndOvertaking();
+            UpdateAgentMaterial();
         }
     }
 
-    void Overtake(Gap frontGap, Gap sideGap) {
+    private bool ShouldEndOvertaking()
+    {   
+        return behaviour == AgentBehaviourType.Overtaking && 
+                ((seekingStart + seekingDuration) < Time.time || agent.remainingDistance <= agent.stoppingDistance);
+    }
 
+    private void EndOvertaking()
+    {
+        agent.SetDestination(destination);
+        behaviour = AgentBehaviourType.Default;
     }
 
     (Gap frontGap, Gap sideGap) OvertakeGapSelection(List<Gap> gaps, Gap searchArea) 
     {
+        Vector3 agentPos = agent.gameObject.transform.position;
+        Vector3 agentToDestination = destination - agentPos;
+
         // Filter gaps that are too small for our agent.
         for (int i = gaps.Count - 1; i >= 0; i--)
         {
@@ -156,15 +174,16 @@ public class AgentControl : MonoBehaviour
             float gapHeight = Mathf.Abs(p1.z - p2.z);
             Vector3 agentScale = agent.gameObject.transform.localScale;
 
-            print(agent.radius * Mathf.Max(agentScale.x, agentScale.z));
+            Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
+            gaps[i].agentToCenter = gapCenter - agentPos;
+            gaps[i].agentToCenter.y = 0;
+
             if (Mathf.Min(gapWidth, gapHeight) < 2 * (agent.radius * Mathf.Max(agentScale.x, agentScale.z)))
             {
                 gaps.RemoveAt(i);
             }
         }
 
-        Vector3 agentPos = agent.gameObject.transform.position;
-        Vector3 agentToDestination = destination - agentPos;
         Vector3 searchArea_p1 = grid.GetWorldPosition((int)searchArea.p1.x, (int)searchArea.p1.y);
         Vector3 searchArea_p2 = grid.GetWorldPosition((int)searchArea.p2.x, (int)searchArea.p2.y);
         Vector3 searchAreaCenter = (searchArea_p1 + searchArea_p2) / 2;
@@ -233,7 +252,7 @@ public class AgentControl : MonoBehaviour
 
     void StopAndGoBehaviour()
     {
-        if (behaviour == AgentBehaviourType.Default && Random.Range(1, 1000) == 1) // TODO: Probability.
+        if (!isOvertaker && behaviour == AgentBehaviourType.Default && Random.Range(1, 1000) == 1) // TODO: Probability.
         {
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
@@ -260,6 +279,7 @@ public class AgentControl : MonoBehaviour
                 DrawGap(fullGap, Color.blue, 0.5f);
 
                 DrawGap(selectedGap, Color.green);
+                behaviour = AgentBehaviourType.GapSeeking;
                 GapSeeking(selectedGap);
                 UpdateAgentMaterial();
             }
@@ -391,7 +411,6 @@ public class AgentControl : MonoBehaviour
 
     public void GapSeeking(Gap gap)
     {
-        behaviour = AgentBehaviourType.GapSeeking;
         // Get limiter objects
         List<GameObject> limiterList = grid.DetectLimiters(gap).FindAll(obj => obj != gameObject);
 
