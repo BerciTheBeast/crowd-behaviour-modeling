@@ -23,8 +23,7 @@ public class MeasurePadController : MonoBehaviour
     void Start()
     {
         VerticeList = new List<Vector3>(GetComponent<MeshFilter>().sharedMesh.vertices); //get vertice points from the mesh of the object
-        rend = GetComponent<Renderer>();
-        area = rend.bounds.size.x * rend.bounds.size.z;
+        area = transform.localScale.x * transform.localScale.z;
     }
 
     // Fixed update is called on physics update
