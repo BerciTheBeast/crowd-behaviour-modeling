@@ -24,6 +24,23 @@ public class SpawnPoint : MonoBehaviour
     [Min(0f)]
     public float spawnCooldown = 1.0f;
 
+    [Range(0, 20)]
+    public int gapSeekerRatio = 10;
+    [Range(0, 20)]
+    public int followerRatio = 10;
+    [Range(0, 20)]
+    public int overtakerRatio = 10;
+    [Range(0, 20)]
+    public int stopAndGoerRatio = 10;
+    [Range(0, 20)]
+    public int defaultRatio = 10;
+
+
+    private float gapSeekerProb = 0f;
+    private float followerProb = 0f;
+    private float overtakerProb = 0f;
+    private float stopAndGoerProb = 0f;
+
     int count = 0;
     private GridComponent grid;
 
@@ -39,6 +56,18 @@ public class SpawnPoint : MonoBehaviour
         {
             StartCoroutine(GenerateAgents());
         }
+
+        int ratio = gapSeekerRatio + followerRatio + overtakerRatio + stopAndGoerRatio + defaultRatio;
+        if (ratio > 0)
+        {
+            gapSeekerProb = (float)gapSeekerRatio / ratio;
+            followerProb = ((float)followerRatio / ratio) + gapSeekerProb;
+            overtakerProb = ((float)overtakerRatio / ratio) + followerProb;
+            stopAndGoerProb = ((float)stopAndGoerRatio / ratio) + overtakerProb;
+        }
+
+
+
     }
 
     // Update is called on every frame.
@@ -91,7 +120,7 @@ public class SpawnPoint : MonoBehaviour
         {
             for (var j = 0; j < spawnAtTime && i < agentCount; j++, i++)
             {
-                GenerateNewAgent(); //go through each corner and set that to the line renderer's position
+                GenerateNewAgent();
             }
             yield return new WaitForSeconds(spawnCooldown);
         }
@@ -103,25 +132,44 @@ public class SpawnPoint : MonoBehaviour
         GameObject capsule = (GameObject)Instantiate(entity, CalculateRandomPoint(), Quaternion.identity);
         capsule.GetComponent<AgentControl>().destination = destination.CalculateRandomPoint();
         capsule.GetComponent<AgentControl>().origin = this;
-        
-        if (count < 1)
+
+        float probability = Random.value;
+        if (probability < gapSeekerProb)
         {
-            count++;
             capsule.GetComponent<AgentControl>().isGapSeeker = true;
             grid.AddGapSeeker(capsule);
-        } else if (count < 4)
+        } else if (probability < followerProb)
         {
-            count++;
             capsule.GetComponent<AgentControl>().isFollower = true;
             grid.AddFollower(capsule);
-        } else if (count < 7) {
-            count++;
+        } else if (probability < overtakerProb)
+        {
             capsule.GetComponent<AgentControl>().isOvertaker = true;
-        } else if (count < 8) {
-            count++;
-            capsule.GetComponent<AgentControl>().isOvertaker = true;
-
+        } else if (probability < stopAndGoerProb)
+        {
+            capsule.GetComponent<AgentControl>().isStopAndGoer = true;
         }
+
+
+        
+        // if (count < 1)
+        // {
+        //     count++;
+        //     capsule.GetComponent<AgentControl>().isGapSeeker = true;
+        //     grid.AddGapSeeker(capsule);
+        // } else if (count < 4)
+        // {
+        //     count++;
+        //     capsule.GetComponent<AgentControl>().isFollower = true;
+        //     grid.AddFollower(capsule);
+        // } else if (count < 7) {
+        //     count++;
+        //     capsule.GetComponent<AgentControl>().isOvertaker = true;
+        // } else if (count < 8) {
+        //     count++;
+        //     capsule.GetComponent<AgentControl>().isOvertaker = true;
+
+        // }
     }
 
     public void Respawn(GameObject capsule)

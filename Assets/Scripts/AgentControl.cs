@@ -41,9 +41,11 @@ public class AgentControl : MonoBehaviour
     [Min(0f)]
     public float destinationTresholdAngle = 78.0f;
     public AgentBehaviourType behaviour = AgentBehaviourType.Default;
+
     public bool isGapSeeker = false;
     public bool isFollower = false;
     public bool isOvertaker = false;
+    public bool isStopAndGoer = false;
 
     private float seekingStart;
     private float seekingDuration;
@@ -253,7 +255,8 @@ public class AgentControl : MonoBehaviour
 
     void StopAndGoBehaviour()
     {
-        if (!isOvertaker && behaviour == AgentBehaviourType.Default && Random.Range(1, 1000) == 1) // TODO: Probability.
+        // if (!isOvertaker && behaviour == AgentBehaviourType.Default && Random.Range(1, 7500) == 1)
+        if (isStopAndGoer && behaviour == AgentBehaviourType.Default && Random.Range(1, 7500) == 1)
         {
             behaviour = AgentBehaviourType.StopAndGo;
             agent.isStopped = true;
