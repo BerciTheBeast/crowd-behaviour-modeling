@@ -1004,13 +1004,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 863622876}
-  m_LocalRotation: {x: 0.4044078, y: -0.18090147, z: 0.07484189, w: 0.8933799}
-  m_LocalPosition: {x: 7.06, y: 12.62, z: -9.66}
+  m_LocalRotation: {x: 0.40453747, y: -0.35588902, z: 0.17848986, w: 0.8233067}
+  m_LocalPosition: {x: 6.22, y: 10.53, z: -7.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 48.561, y: -23.386, z: -1.09}
+  m_LocalEulerAnglesHint: {x: 52.482, y: -46.478, z: 0.561}
 --- !u!1001 &1204441710
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1028,15 +1028,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: followerRatio
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: gapSeekerRatio
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: stopAndGoerRatio
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -1398,15 +1410,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: followerRatio
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: gapSeekerRatio
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: stopAndGoerRatio
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -1530,15 +1554,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: followerRatio
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: gapSeekerRatio
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: stopAndGoerRatio
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -1905,15 +1941,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: followerRatio
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: gapSeekerRatio
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: stopAndGoerRatio
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -1988,6 +2036,10 @@ PrefabInstance:
     - target: {fileID: 5354734479012906250, guid: 9b16e46dd3ae6314fa0a64b5ceed5326, type: 3}
       propertyPath: m_Name
       value: MeasurePad
+      objectReference: {fileID: 0}
+    - target: {fileID: 5354734479012906250, guid: 9b16e46dd3ae6314fa0a64b5ceed5326, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5354734479012906260, guid: 9b16e46dd3ae6314fa0a64b5ceed5326, type: 3}
       propertyPath: m_Size.y
