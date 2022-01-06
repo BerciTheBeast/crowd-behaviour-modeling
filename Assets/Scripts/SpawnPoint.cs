@@ -24,15 +24,16 @@ public class SpawnPoint : MonoBehaviour
     [Min(0f)]
     public float spawnCooldown = 1.0f;
 
-    [Range(0, 20)]
+    private const int ratioLimit = 20;
+    [Range(0, ratioLimit)]
     public int gapSeekerRatio = 10;
-    [Range(0, 20)]
+    [Range(0, ratioLimit)]
     public int followerRatio = 10;
-    [Range(0, 20)]
+    [Range(0, ratioLimit)]
     public int overtakerRatio = 10;
-    [Range(0, 20)]
+    [Range(0, ratioLimit)]
     public int stopAndGoerRatio = 10;
-    [Range(0, 20)]
+    [Range(0, ratioLimit)]
     public int defaultRatio = 10;
 
 

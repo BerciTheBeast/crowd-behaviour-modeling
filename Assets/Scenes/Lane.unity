@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44097802, g: 0.489707, b: 0.5698012, a: 1}
+  m_IndirectSpecularColor: {r: 0.44097766, g: 0.48970622, b: 0.5698002, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -688,13 +688,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 863622876}
-  m_LocalRotation: {x: 0.008555776, y: -0.9367197, z: 0.34985545, w: -0.009171368}
-  m_LocalPosition: {x: -0.05, y: 5.6, z: 5.23}
+  m_LocalRotation: {x: 0.009582401, y: -0.9367704, z: 0.34946346, w: -0.01564162}
+  m_LocalPosition: {x: -0.39, y: 3.54, z: 2.85}
   m_LocalScale: {x: 0.7069, y: 0.7069, z: 0.7069}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 40.941, y: -181.758, z: -1.703}
+  m_LocalEulerAnglesHint: {x: 40.877, y: -182.729, z: -2.189}
 --- !u!1001 &1204441710
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -712,15 +712,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: defaultRatio
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: followerRatio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: gapSeekerRatio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: overtakerRatio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: stopAndGoerRatio
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint
@@ -836,15 +856,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: agentCount
-      value: 15
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnAtTime
-      value: 2
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: defaultRatio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: followerRatio
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: spawnCooldown
       value: 0.51
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: gapSeekerRatio
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: overtakerRatio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
+      propertyPath: stopAndGoerRatio
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1527476820510052619, guid: a002848310d1e014e969bac9a84e5f18, type: 3}
       propertyPath: destinationSpawnPoint

@@ -245,13 +245,14 @@ MonoBehaviour:
   seeds: 5
   gapSearchArea: 15
   visionRadius: 2
-  visionAngle: 60
+  visionAngle: 45
   deviationAngle: 83
   destinationTresholdAngle: 78
   behaviour: 0
   isGapSeeker: 0
   isFollower: 0
   isOvertaker: 0
+  isStopAndGoer: 0
   followedBy: {fileID: 0}
   followingTarget: {fileID: 0}
   followingStart: 0

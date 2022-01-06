@@ -435,7 +435,7 @@ public class AgentControl : MonoBehaviour
 
         // Calculate gap position in the future.
         Vector3 gapCenter = (grid.GetWorldPosition((int)gap.p1.x, (int)gap.p1.y) + grid.GetWorldPosition((int)gap.p2.x, (int)gap.p2.y)) / 2;
-        Vector3 gapDestination = gapCenter + gapSpeed * seekingTime;
+        Vector3 gapDestination = gapCenter + (gapSpeed / 5) * seekingTime;
 
         // Set new agent destination
         seekingStart = Time.time;
